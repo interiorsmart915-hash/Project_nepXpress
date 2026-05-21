@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shipment History - NepXpress</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='common.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin-dashboard.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='shipment-history.css') }}" />
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="{{ url_for('static', filename='logo.png') }}" alt="NepXpress" class="sidebar-logo" />
+      <span class="sidebar-tagline">Logistics Management</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="/dashboard" class="nav-item">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a href="/create-shipment" class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        Create Delivery
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Track Shipment
+      </a>
+      <a href="/shipment-history" class="nav-item active">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        History
+      </a>
+      <a href="/settings" class="nav-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">JD</div>
+      <div class="user-info">
+        <span class="user-name">John Doe</span>
+        <span class="user-role">Customer</span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-title">
+        <h1>Shipment History</h1>
+        <p>View and manage all your past deliveries</p>
+      </div>
+      <button class="notif-btn">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+    </header>
+
+    <main class="content">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Shipment History</h1>
+          <p class="page-sub">View and manage all your past deliveries</p>
+        </div>
+        <button class="btn-primary">+ Create New Shipment</button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-number">48</div>
+          <div class="stat-label">Total Shipments</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">41</div>
+          <div class="stat-label">Delivered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">4</div>
+          <div class="stat-label">In Transit</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Processing</div>
+        </div>
+      </div>
+
+      <div class="filters-bar">
+        <div class="filter-tabs">
+          <button class="filter-tab active">All</button>
+          <button class="filter-tab">Delivered</button>
+          <button class="filter-tab">In Transit</button>
+          <button class="filter-tab">Processing</button>
+          <button class="filter-tab">Cancelled</button>
+        </div>
+        <div class="filter-right">
+          <div class="search-box">
+            <span class="search-icon">◎</span>
+            <input type="text" placeholder="Search by tracking ID or address..." />
+          </div>
+          <select class="filter-select">
+            <option>All Time</option>
+            <option>Last 7 days</option>
+            <option>Last 30 days</option>
+            <option>Last 3 months</option>
+            <option>This year</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table class="shipment-table">
+          <thead>
+            <tr>
+              <th>Tracking ID</th>
+              <th>Recipient</th>
+              <th>Destination</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td class="tracking-id">NXP-2849</td>
+              <td>
+                <div class="recipient-name">Sita Rai</div>
+                <div class="recipient-phone">+977 9812345678</div>
+              </td>
+              <td>Kathmandu, Bagmati</td>
+              <td>
+                <div>May 18, 2026</div>
+                <div class="time-sub">2 hours ago</div>
+              </td>
+              <td>Parcel</td>
+              <td>NPR 350</td>
+              <td><span class="badge transit">In Transit</span></td>
+              <td class="actions">
+                <button class="action-btn">Track</button>
+                <button class="action-btn">Details</button>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="tracking-id">NXP-2848</td>
+              <td>
+                <div class="recipient-name">Hari Thapa</div>
+                <div class="recipient-phone">+977 9865432100</div>
+              </td>
+              <td>Pokhara, Gandaki</td>
+              <td>
+                <div>May 18, 2026</div>
+                <div class="time-sub">5 hours ago</div>
+              </td>
+              <td>Document</td>
+              <td>NPR 150</td>
+              <td><span class="badge processing">Processing</span></td>
+              <td class="actions">
+                <button class="action-btn">Track</button>
+                <button class="action-btn">Details</button>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="tracking-id">NXP-2847</td>
+              <td>
+                <div class="recipient-name">Maya Shrestha</div>
+                <div class="recipient-phone">+977 9856781234</div>
+              </td>
+              <td>Lalitpur, Bagmati</td>
+              <td>
+                <div>May 17, 2026</div>
+                <div class="time-sub">1 day ago</div>
+              </td>
+              <td>Electronics</td>
+              <td>NPR 500</td>
+              <td><span class="badge delivered">Delivered</span></td>
+              <td class="actions">
+                <button class="action-btn">Track</button>
+                <button class="action-btn">Details</button>
+                <button class="action-btn">Reorder</button>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="tracking-id">NXP-2846</td>
+              <td>
+                <div class="recipient-name">Bikash Karki</div>
+                <div class="recipient-phone">+977 9841122334</div>
+              </td>
+              <td>Bhaktapur, Bagmati</td>
+              <td>
+                <div>May 16, 2026</div>
+                <div class="time-sub">2 days ago</div>
+              </td>
+              <td>Fragile</td>
+              <td>NPR 350</td>
+              <td><span class="badge delivered">Delivered</span></td>
+              <td class="actions">
+                <button class="action-btn">Track</button>
+                <button class="action-btn">Details</button>
+                <button class="action-btn">Reorder</button>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="tracking-id">NXP-2845</td>
+              <td>
+                <div class="recipient-name">Sunita Gurung</div>
+                <div class="recipient-phone">+977 9878887776</div>
+              </td>
+              <td>Chitwan, Bagmati</td>
+              <td>
+                <div>May 15, 2026</div>
+                <div class="time-sub">3 days ago</div>
+              </td>
+              <td>Clothing</td>
+              <td>NPR 150</td>
+              <td><span class="badge cancelled">Cancelled</span></td>
+              <td class="actions">
+                <button class="action-btn">Details</button>
+                <button class="action-btn danger">Delete</button>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="tracking-id">NXP-2844</td>
+              <td>
+                <div class="recipient-name">Rohan Maharjan</div>
+                <div class="recipient-phone">+977 9800112233</div>
+              </td>
+              <td>Butwal, Lumbini</td>
+              <td>
+                <div>May 14, 2026</div>
+                <div class="time-sub">4 days ago</div>
+              </td>
+              <td>Parcel</td>
+              <td>NPR 500</td>
+              <td><span class="badge delivered">Delivered</span></td>
+              <td class="actions">
+                <button class="action-btn">Track</button>
+                <button class="action-btn">Details</button>
+                <button class="action-btn">Reorder</button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <span class="page-info">Showing 1–6 of 48 shipments</span>
+        <div class="page-controls">
+          <button class="page-btn" disabled>← Prev</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <span class="page-dots">...</span>
+          <button class="page-btn">8</button>
+          <button class="page-btn">Next →</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <button class="help-btn">?</button>
+
+</body>
+</html>
