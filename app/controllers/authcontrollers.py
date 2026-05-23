@@ -5,7 +5,7 @@ class AuthController:
         return render_template('login.html')
     
     def register(self):
-        return render_template('register-page.html')
+        return render_template('register.html')
     
     def dashboard(self):
         return render_template('dashboard.html')
