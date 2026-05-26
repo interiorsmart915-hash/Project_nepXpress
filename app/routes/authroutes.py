@@ -17,12 +17,6 @@ class Authroutes:
       self.bp.route("/register", methods=["GET", "POST"])(
             self.controller.register
       )
-      self.bp.route("/dashboard", methods=["GET", "POST"])(
-            self.controller.dashboard
-      )
-      self.bp.route("/admin-dashboard", methods=["GET", "POST"])(
-            self.controller.admin_dashboard
-      )
        
       self.bp.route("/settings", methods=["GET", "POST"])(
             self.controller.settings
