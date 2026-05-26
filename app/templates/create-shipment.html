@@ -11,7 +11,7 @@
 </head>
 <body>
 
-  <!-- SIDEBAR -->
+  <!-- ── SIDEBAR: left navigation panel ── -->
   <aside class="sidebar">
     <div class="sidebar-brand">
       <img src="{{ url_for('static', filename='logo.png') }}" alt="NepXpress" class="sidebar-logo" />
@@ -41,6 +41,7 @@
       </a>
     </nav>
 
+    <!-- Logged-in user shown at the bottom of the sidebar -->
     <div class="sidebar-user">
       <div class="user-avatar">JD</div>
       <div class="user-info">
@@ -50,6 +51,7 @@
     </div>
   </aside>
 
+  <!-- ── MAIN WRAPPER: topbar + content ── -->
   <div class="main-wrapper">
     <header class="topbar">
       <div class="topbar-title">
@@ -63,8 +65,10 @@
     </header>
 
     <main class="content">
+      <!-- form-grid: 2-column layout; full-width cards span both columns -->
       <div class="form-grid">
 
+        <!-- CARD 1: Who is sending the package -->
         <section class="card">
           <h2 class="card-title">Sender Information</h2>
           <div class="form-group">
@@ -79,6 +83,7 @@
             <label>Pickup Address</label>
             <input type="text" placeholder="Street address, area" />
           </div>
+          <!-- City and District side by side -->
           <div class="form-row">
             <div class="form-group">
               <label>City</label>
@@ -98,6 +103,7 @@
           </div>
         </section>
 
+        <!-- CARD 2: Who is receiving the package -->
         <section class="card">
           <h2 class="card-title">Receiver Information</h2>
           <div class="form-group">
@@ -112,6 +118,7 @@
             <label>Delivery Address</label>
             <input type="text" placeholder="Street address, area" />
           </div>
+          <!-- City and District side by side -->
           <div class="form-row">
             <div class="form-group">
               <label>City</label>
@@ -131,8 +138,11 @@
           </div>
         </section>
 
+        <!-- CARD 3: What is being sent (full width) -->
         <section class="card full-width">
           <h2 class="card-title">Package Details</h2>
+
+          <!-- Row 1: type, weight, value -->
           <div class="form-row three-col">
             <div class="form-group">
               <label>Package Type</label>
@@ -156,6 +166,7 @@
             </div>
           </div>
 
+          <!-- Row 2: dimensions -->
           <div class="form-row three-col">
             <div class="form-group">
               <label>Length (cm)</label>
@@ -171,12 +182,14 @@
             </div>
           </div>
 
+          <!-- Free text for any special handling notes -->
           <div class="form-group">
             <label>Special Instructions</label>
             <textarea placeholder="Handle with care, keep upright, etc."></textarea>
           </div>
         </section>
 
+        <!-- CARD 4: Speed of delivery (full width) -->
         <section class="card full-width">
           <h2 class="card-title">Delivery Options</h2>
           <div class="delivery-options">
@@ -207,6 +220,7 @@
           </div>
         </section>
 
+        <!-- CARD 5: How the customer pays (full width) -->
         <section class="card full-width">
           <h2 class="card-title">Payment Method</h2>
           <div class="payment-options">
@@ -235,6 +249,7 @@
 
       </div>
 
+      <!-- ── SUMMARY BAR: total price + action buttons ── -->
       <div class="summary-bar">
         <div class="summary-info">
           <div class="summary-label">Estimated Total</div>
@@ -248,10 +263,12 @@
     </main>
   </div>
 
+  <!-- Floating help button, bottom-right corner -->
   <button class="help-btn">?</button>
 
+  <!-- ── JAVASCRIPT ── -->
   <script>
-    // ── DELIVERY OPTION CARDS ──
+    // Highlight whichever delivery speed the user clicks
     document.querySelectorAll('.option-card').forEach(function(card) {
       card.addEventListener('click', function() {
         document.querySelectorAll('.option-card').forEach(function(c) {
@@ -261,7 +278,7 @@
       });
     });
 
-    // ── PAYMENT CARDS ──
+    // Highlight whichever payment method the user clicks
     document.querySelectorAll('.payment-card').forEach(function(card) {
       card.addEventListener('click', function() {
         document.querySelectorAll('.payment-card').forEach(function(c) {
@@ -271,12 +288,12 @@
       });
     });
 
-    // ── SAVE AS DRAFT ──
+    // Save draft — placeholder alert for now
     document.getElementById('saveDraftBtn').addEventListener('click', function() {
       alert('Shipment saved as draft!');
     });
 
-    // ── CONFIRM & CREATE ──
+    // Confirm — validate sender/receiver names before submitting
     document.getElementById('confirmBtn').addEventListener('click', function() {
       var senderName = document.getElementById('senderName').value;
       var receiverName = document.getElementById('receiverName').value;

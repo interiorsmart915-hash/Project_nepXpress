@@ -12,7 +12,7 @@
 
 <body>
 
-  <!-- SIDEBAR -->
+  <!-- ── SIDEBAR: left navigation panel ── -->
   <aside class="sidebar">
     <div class="sidebar-brand">
       <img src="{{ url_for('static', filename='logo.png') }}" alt="NepXpress" class="sidebar-logo" />
@@ -42,6 +42,7 @@
       </a>
     </nav>
 
+    <!-- Logged-in user info shown at bottom of sidebar -->
     <div class="sidebar-user">
       <div class="user-avatar">JD</div>
       <div class="user-info">
@@ -51,7 +52,7 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
+  <!-- ── MAIN CONTENT ── -->
   <main class="main">
 
     <div class="page-header">
@@ -61,9 +62,10 @@
       </div>
     </div>
 
+    <!-- 2-column grid: each section is a card -->
     <div class="settings-grid">
 
-      <!-- PROFILE -->
+      <!-- CARD 1: Edit profile info -->
       <section class="card">
         <div class="card-head">
           <div class="card-icon">👤</div>
@@ -91,7 +93,7 @@
         <button class="btn-primary" id="saveProfileBtn">Save Changes</button>
       </section>
 
-      <!-- PASSWORD -->
+      <!-- CARD 2: Change password -->
       <section class="card">
         <div class="card-head">
           <div class="card-icon">🔒</div>
@@ -115,7 +117,7 @@
         <button class="btn-primary" id="changePassBtn">Update Password</button>
       </section>
 
-      <!-- PREFERENCES -->
+      <!-- CARD 3: UI preferences like dark mode -->
       <section class="card">
         <div class="card-head">
           <div class="card-icon">🎨</div>
@@ -145,7 +147,7 @@
         <button class="btn-primary" id="savePrefBtn">Save Preferences</button>
       </section>
 
-      <!-- DANGER ZONE -->
+      <!-- CARD 4: Destructive actions — logout and delete -->
       <section class="card danger-card full-width">
         <div class="card-head">
           <div class="card-icon">⚠️</div>
@@ -176,7 +178,9 @@
     </div>
   </main>
 
+  <!-- ── JAVASCRIPT: button actions ── -->
   <script>
+    // Validate and update password
     document.getElementById('changePassBtn').addEventListener('click', function() {
       var current = document.getElementById('currentPass').value;
       var newPass = document.getElementById('newPass').value;
@@ -186,20 +190,24 @@
       alert('Password updated successfully!');
     });
 
+    // Save profile info
     document.getElementById('saveProfileBtn').addEventListener('click', function() {
       alert('Profile updated successfully!');
     });
 
+    // Save preferences
     document.getElementById('savePrefBtn').addEventListener('click', function() {
       alert('Preferences saved successfully!');
     });
 
+    // Logout with confirmation
     document.getElementById('logoutBtn').addEventListener('click', function() {
       if (confirm('Are you sure you want to logout?')) {
         window.location.href = '/';
       }
     });
 
+    // Delete account — double confirmation for safety
     document.getElementById('deleteAccountBtn').addEventListener('click', function() {
       if (confirm('This will permanently delete your account.')) {
         if (confirm('Final warning! Continue?')) {
@@ -208,6 +216,7 @@
       }
     });
 
+    // Toggle dark mode class on body
     document.getElementById('themeToggle').addEventListener('change', function() {
       document.body.classList.toggle('dark-mode');
     });
