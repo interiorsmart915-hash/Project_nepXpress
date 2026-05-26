@@ -20,12 +20,6 @@ class Authroutes:
       self.bp.route("/admin-dashboard", methods=["GET", "POST"])(
             self.controller.admin_dashboard
       )
-      self.bp.route("/create-shipment", methods=["GET", "POST"])(
-            self.controller.create_shipment
-      )
-      self.bp.route("/shipment-history", methods=["GET", "POST"])(
-            self.controller.shipment_history
-      )
        
       self.bp.route("/settings", methods=["GET", "POST"])(
             self.controller.settings

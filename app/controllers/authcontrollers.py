@@ -12,13 +12,7 @@ class AuthController:
     
     def admin_dashboard(self):
         return render_template('admin-dashboard.html')
-    
-    def create_shipment(self):
-        return render_template('create-shipment.html')
-    
-    def shipment_history(self):
-        return render_template('shipment-history.html')
-     
+
     def settings(self):
         return render_template('settings.html')
     
