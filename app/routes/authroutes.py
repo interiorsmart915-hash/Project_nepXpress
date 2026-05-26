@@ -7,10 +7,7 @@ class Authroutes:
 
    def login(self):
    
-      
-      self.bp.route("/", methods=["GET", "POST"])(
-            self.controller.login
-      )
+     
       self.bp.route("/login", methods=["GET", "POST"])(
             self.controller.login
       )
