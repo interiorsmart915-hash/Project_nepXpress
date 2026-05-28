@@ -32,6 +32,14 @@ def create_app():
     def admin_dashboard():
         return render_template("admin-dashboard.html")
     
+    @app.route('/admin-agents')
+    def admin_agents():
+        return render_template('admin-agents.html')
+    
+    @app.route('/admin-users')
+    def admin_users():
+        return render_template('admin-users.html')
+    
     @app.route("/create-shipment")
     def create_shipment():
         return render_template("create-shipment.html")

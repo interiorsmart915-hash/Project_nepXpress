@@ -21,4 +21,5 @@ class Authroutes:
       self.bp.route("/base", methods=["GET", "POST"])(
             self.controller.base
       )
+
       return self.bp    

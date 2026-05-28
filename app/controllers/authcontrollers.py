@@ -47,6 +47,7 @@ class AuthController(BaseController):
     
     def base(self):
         return render_template('base.html')
+    
 
     
  

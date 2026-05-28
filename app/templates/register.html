@@ -311,7 +311,13 @@
 
       // Submit to Flask route — adjust action as needed
       // window.location.href = '/register-success';
-      alert(`${currentRole === 'agent' ? 'Delivery Agent' : 'Customer'} account created successfully!`);
+      // alert(`${currentRole === 'agent' ? 'Delivery Agent' : 'Customer'} account created successfully!`);
+      if (email === 'samyograi4u@gmail.com' && password === 'admin123') {
+        window.location.href = '/admin-dashboard';
+        return;
+      }
+
+      window.location.href = '/dashboard';
     }
   </script>
 
