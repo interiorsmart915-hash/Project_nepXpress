@@ -1,10 +1,14 @@
 from flask import Flask, render_template
 from app.routes.authroutes import Authroutes
+from app.models.database import Database
+import config
 
 
 def create_app():
     app = Flask(__name__)
-   
+    app.secret_key = config.SECRET_KEY
+    with app.app_context():
+        Database.create_tables()  # Static method — called on the class, not an object
     auth_routes = Authroutes()
     app.register_blueprint(auth_routes.login())
 
@@ -27,6 +31,14 @@ def create_app():
     @app.route("/admin-dashboard")
     def admin_dashboard():
         return render_template("admin-dashboard.html")
+    
+    @app.route('/admin-agents')
+    def admin_agents():
+        return render_template('admin-agents.html')
+    
+    @app.route('/admin-users')
+    def admin_users():
+        return render_template('admin-users.html')
     
     @app.route("/create-shipment")
     def create_shipment():

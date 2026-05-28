@@ -7,24 +7,12 @@ class Authroutes:
 
    def login(self):
    
-
+     
       self.bp.route("/login", methods=["GET", "POST"])(
             self.controller.login
       )
       self.bp.route("/register", methods=["GET", "POST"])(
             self.controller.register
-      )
-      self.bp.route("/dashboard", methods=["GET", "POST"])(
-            self.controller.dashboard
-      )
-      self.bp.route("/admin-dashboard", methods=["GET", "POST"])(
-            self.controller.admin_dashboard
-      )
-      self.bp.route("/create-shipment", methods=["GET", "POST"])(
-            self.controller.create_shipment
-      )
-      self.bp.route("/shipment-history", methods=["GET", "POST"])(
-            self.controller.shipment_history
       )
        
       self.bp.route("/settings", methods=["GET", "POST"])(
@@ -33,4 +21,5 @@ class Authroutes:
       self.bp.route("/base", methods=["GET", "POST"])(
             self.controller.base
       )
+
       return self.bp    

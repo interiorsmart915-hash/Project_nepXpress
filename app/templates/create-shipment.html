@@ -11,7 +11,7 @@
 </head>
 <body>
 
-  <!-- SIDEBAR -->
+  <!-- ── SIDEBAR: left navigation panel ── -->
   <aside class="sidebar">
     <div class="sidebar-brand">
       <img src="{{ url_for('static', filename='logo.png') }}" alt="NepXpress" class="sidebar-logo" />
@@ -27,7 +27,7 @@
         <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
         Create Delivery
       </a>
-      <a href="/settings" class="nav-item">
+      <a href="/track-shipment" class="nav-item">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Track Shipment
       </a>
@@ -35,12 +35,13 @@
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         History
       </a>
-      <a href="#" class="nav-item">
+      <a href="/settings" class="nav-item">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M8.46 8.46a5 5 0 0 0 0 7.07"/></svg>
         Settings
       </a>
     </nav>
 
+    <!-- Logged-in user shown at the bottom of the sidebar -->
     <div class="sidebar-user">
       <div class="user-avatar">JD</div>
       <div class="user-info">
@@ -50,6 +51,7 @@
     </div>
   </aside>
 
+  <!-- ── MAIN WRAPPER: topbar + content ── -->
   <div class="main-wrapper">
     <header class="topbar">
       <div class="topbar-title">
@@ -63,13 +65,15 @@
     </header>
 
     <main class="content">
+      <!-- form-grid: 2-column layout; full-width cards span both columns -->
       <div class="form-grid">
 
+        <!-- CARD 1: Who is sending the package -->
         <section class="card">
           <h2 class="card-title">Sender Information</h2>
           <div class="form-group">
             <label>Full Name</label>
-            <input type="text" placeholder="Enter sender's full name" />
+            <input type="text" id="senderName" placeholder="Enter sender's full name" />
           </div>
           <div class="form-group">
             <label>Phone Number</label>
@@ -79,6 +83,7 @@
             <label>Pickup Address</label>
             <input type="text" placeholder="Street address, area" />
           </div>
+          <!-- City and District side by side -->
           <div class="form-row">
             <div class="form-group">
               <label>City</label>
@@ -98,11 +103,12 @@
           </div>
         </section>
 
+        <!-- CARD 2: Who is receiving the package -->
         <section class="card">
           <h2 class="card-title">Receiver Information</h2>
           <div class="form-group">
             <label>Full Name</label>
-            <input type="text" placeholder="Enter receiver's full name" />
+            <input type="text" id="receiverName" placeholder="Enter receiver's full name" />
           </div>
           <div class="form-group">
             <label>Phone Number</label>
@@ -112,6 +118,7 @@
             <label>Delivery Address</label>
             <input type="text" placeholder="Street address, area" />
           </div>
+          <!-- City and District side by side -->
           <div class="form-row">
             <div class="form-group">
               <label>City</label>
@@ -131,8 +138,11 @@
           </div>
         </section>
 
+        <!-- CARD 3: What is being sent (full width) -->
         <section class="card full-width">
           <h2 class="card-title">Package Details</h2>
+
+          <!-- Row 1: type, weight, value -->
           <div class="form-row three-col">
             <div class="form-group">
               <label>Package Type</label>
@@ -156,6 +166,7 @@
             </div>
           </div>
 
+          <!-- Row 2: dimensions -->
           <div class="form-row three-col">
             <div class="form-group">
               <label>Length (cm)</label>
@@ -171,12 +182,14 @@
             </div>
           </div>
 
+          <!-- Free text for any special handling notes -->
           <div class="form-group">
             <label>Special Instructions</label>
             <textarea placeholder="Handle with care, keep upright, etc."></textarea>
           </div>
         </section>
 
+        <!-- CARD 4: Speed of delivery (full width) -->
         <section class="card full-width">
           <h2 class="card-title">Delivery Options</h2>
           <div class="delivery-options">
@@ -207,6 +220,7 @@
           </div>
         </section>
 
+        <!-- CARD 5: How the customer pays (full width) -->
         <section class="card full-width">
           <h2 class="card-title">Payment Method</h2>
           <div class="payment-options">
@@ -235,64 +249,64 @@
 
       </div>
 
+      <!-- ── SUMMARY BAR: total price + action buttons ── -->
       <div class="summary-bar">
         <div class="summary-info">
           <div class="summary-label">Estimated Total</div>
           <div class="summary-amount">NPR 150</div>
         </div>
         <div class="summary-actions">
-          <button class="btn-outline">Save as Draft</button>
-          <button class="btn-primary">Confirm &amp; Create Shipment</button>
+          <button class="btn-outline" id="saveDraftBtn">Save as Draft</button>
+          <button class="btn-primary" id="confirmBtn">Confirm &amp; Create Shipment</button>
         </div>
       </div>
     </main>
   </div>
 
+  <!-- Floating help button, bottom-right corner -->
   <button class="help-btn">?</button>
 
+  <!-- ── JAVASCRIPT ── -->
   <script>
-    document.querySelector('.nav-item:nth-child(4)').href = '/shipment-history';
-document.querySelector('.nav-item:nth-child(5)').href = '/settings';
-
-  // ── DELIVERY OPTION CARDS (click whole card to select) ──
-  document.querySelectorAll('.option-card').forEach(function(card) {
-    card.addEventListener('click', function() {
-      document.querySelectorAll('.option-card').forEach(function(c) {
-        c.classList.remove('selected');
+    // Highlight whichever delivery speed the user clicks
+    document.querySelectorAll('.option-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('.option-card').forEach(function(c) {
+          c.classList.remove('selected');
+        });
+        card.classList.add('selected');
       });
-      card.classList.add('selected');
     });
-  });
 
-  // ── PAYMENT CARDS (click whole card to select) ──────────
-  document.querySelectorAll('.payment-card').forEach(function(card) {
-    card.addEventListener('click', function() {
-      document.querySelectorAll('.payment-card').forEach(function(c) {
-        c.classList.remove('selected');
+    // Highlight whichever payment method the user clicks
+    document.querySelectorAll('.payment-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        document.querySelectorAll('.payment-card').forEach(function(c) {
+          c.classList.remove('selected');
+        });
+        card.classList.add('selected');
       });
-      card.classList.add('selected');
     });
-  });
 
-  // ── SAVE AS DRAFT BUTTON ────────────────────────────────
-  document.querySelector('.btn-outline').addEventListener('click', function() {
-    alert('Shipment saved as draft!');
-    // TODO: send draft data to your backend here
-  });
+    // Save draft — placeholder alert for now
+    document.getElementById('saveDraftBtn').addEventListener('click', function() {
+      alert('Shipment saved as draft!');
+    });
 
-  // ── CONFIRM & CREATE SHIPMENT BUTTON ───────────────────
-  document.querySelector('.btn-primary').addEventListener('click', function() {
-    // Simple check: make sure key fields are not empty
-    var senderName = document.querySelectorAll('input[type="text"]')[0].value;
-    var receiverName = document.querySelectorAll('input[type="text"]')[3].value;
+    // Confirm — validate sender/receiver names before submitting
+    document.getElementById('confirmBtn').addEventListener('click', function() {
+      var senderName = document.getElementById('senderName').value;
+      var receiverName = document.getElementById('receiverName').value;
 
-    if (senderName === '' || receiverName === '') {
-      alert('Please fill in sender and receiver names before submitting.');
-      return;
-    }
+      if (senderName === '' || receiverName === '') {
+        alert('Please fill in sender and receiver names before submitting.');
+        return;
+      }
 
-    alert('Shipment created successfully! Redirecting to history...');
-    // TODO: collect all form data and POST to your backend, then redirect
-    // window.location.href = 'history.html';
-  });
-</script>
+      alert('Shipment created successfully! Redirecting to history...');
+      // window.location.href = '/shipment-history';
+    });
+  </script>
+
+</body>
+</html>
