@@ -6,18 +6,12 @@ import os
 
 
 def create_app():
-    # Method 1: Try using the module's directory
+    # Get project paths
     app_dir = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.dirname(app_dir)
     
     template_folder = os.path.join(project_root, 'templates')
     static_folder = os.path.join(project_root, 'static')
-    
-    # Debug: Print the paths
-    print(f"📁 App directory: {app_dir}")
-    print(f"📁 Project root: {project_root}")
-    print(f"📁 Template folder: {template_folder}")
-    print(f"📁 Template exists: {os.path.exists(template_folder)}")
     
     # Create Flask app
     app = Flask(

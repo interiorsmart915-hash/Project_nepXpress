@@ -63,6 +63,18 @@
 
  <!-- ══ RIGHT PANEL ══════════════════════════════════════════ -->
 <main class="right-panel">
+  <!-- ══ FLASH MESSAGES (AUTO-DISMISS WITH CSS) ══ -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          <span>{{ message }}</span>
+          <button onclick="this.parentElement.style.display='none';">×</button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
   <div class="login-card">
 
     <h1 class="login-heading">Welcome Back</h1>
@@ -131,3 +143,5 @@
 </main>
 
 <button class="help-btn">?</button>
+</body>
+</html>

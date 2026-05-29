@@ -63,6 +63,18 @@
 
   <!-- ══ RIGHT PANEL ══════════════════════════════════════════ -->
 <main class="right-panel">
+   <!-- ══ FLASH MESSAGES ══ -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" style="margin-bottom: 20px; padding: 12px; border-radius: 8px; {% if category == 'danger' %}background: #fee; color: #c33; border: 1px solid #c33;{% else %}background: #efe; color: #3c3; border: 1px solid #3c3;{% endif %}">
+          {{ message }}
+          <button onclick="this.parentElement.style.display='none';" style="float: right; background: none; border: none; cursor: pointer; font-size: 18px; color: inherit;">×</button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
   <div class="register-card">
 
     <h1 class="register-heading">Create an Account</h1>

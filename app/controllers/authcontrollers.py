@@ -103,5 +103,3 @@ class AuthController(BaseController):
     # ========== BASE METHOD ==========
     def base(self):
         return render_template('base.html')
-    
- 
