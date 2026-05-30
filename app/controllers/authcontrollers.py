@@ -29,6 +29,8 @@ class AuthController(BaseController):
             session["user_email"] = user_data["email"]
             session["user_role"] = user_data["role"]
             flash(f"Welcome, {user_data['name']}!", "success")
+            if user_data["role"] == "admin":
+                return redirect(url_for("admin_dashboard"))
             return redirect(url_for("dashboard"))
 
     def register(self):
