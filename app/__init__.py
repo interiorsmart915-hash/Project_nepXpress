@@ -58,6 +58,34 @@ def create_app():
         return redirect(url_for("auth.login"))
 
     # ── PROTECTED ───────────────────────────────────────────
+    
+    @app.route("/delete-account", methods=["GET", "POST"])
+    @login_required
+    @no_cache
+    def delete_account():
+        if request.method == "GET":
+            return render_template("delete-account.html")
+
+        password = request.form.get("password", "").strip()
+        if not password:
+            flash("Password is required to delete your account.", "danger")
+            return render_template("delete-account.html")
+
+        user_email = session.get("user_email")
+        user = User(email=user_email)
+        user_data = user.find_by("email", user_email)
+        if not user_data:
+            flash("User not found.", "danger")
+            return render_template("delete-account.html")
+
+        if not user.check_password(password):
+            flash("Incorrect password. Please try again.", "danger")
+            return render_template("delete-account.html")
+
+        user.delete_account()
+        session.clear()
+        flash("Your account has been permanently deleted.", "success")
+        return redirect(url_for("auth.login"))
 
     @app.route("/dashboard")
     @login_required

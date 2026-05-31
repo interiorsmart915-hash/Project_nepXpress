@@ -170,11 +170,10 @@
     });
 
     // Delete account — double confirmation for safety
+// Delete account — first confirm, then go to password-confirmation page
     document.getElementById('deleteAccountBtn').addEventListener('click', function() {
-      if (confirm('This will permanently delete your account.')) {
-        if (confirm('Final warning! Continue?')) {
-          window.location.href = '/';
-        }
+      if (confirm('This will permanently delete your account. Continue?')) {
+        window.location.href = '/delete-account';
       }
     });
   </script>

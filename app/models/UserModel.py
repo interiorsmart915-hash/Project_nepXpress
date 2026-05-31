@@ -13,6 +13,13 @@ class User(BaseModel):
         self.__password = password  # Private attribute for plain text
         self.role = role
         self.created_at = None
+    
+    def delete_account(self):
+        """Permanently delete this user from the database by email."""
+        db = Database()
+        query = f"DELETE FROM {self.table} WHERE email=%s"
+        db.execute(query, (self.email,))
+        db.close()
         
     
     def save(self):
