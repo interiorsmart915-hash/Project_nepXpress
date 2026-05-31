@@ -16,7 +16,7 @@ class Dashboardroutes:
         )
         self.bp.add_url_rule(
             "/admin-dashboard",
-            endpoint="admin_dashboard",
+            endpoint="admin-dashboard",
             view_func=self.controller.admin_dashboard,
             methods=["GET", "POST"]
         )
