@@ -7,8 +7,4 @@ class ShipmentController:
     def shipment_history(self):
         return render_template('shipment-history.html')
      
-    def admin_agents(self):
-        return render_template('admin-agents.html')
-    
-    def admin_users(self):
-        return render_template('admin-users.html')
+  
