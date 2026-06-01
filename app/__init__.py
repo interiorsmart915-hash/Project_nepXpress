@@ -34,7 +34,7 @@ def create_app():
     project_root = os.path.dirname(app_dir)
 
     template_folder = os.path.join(project_root, 'templates')
-    static_folder = os.path.join(project_root, 'static')
+    static_folder   = os.path.join(project_root, 'static')
 
     app = Flask(
         __name__,
@@ -45,12 +45,17 @@ def create_app():
     app.secret_key = config.SECRET_KEY
 
     with app.app_context():
-        Database.create_tables()
+        Database.create_tables()          # ← now creates all 4 tables
 
+    # ── Teammate's auth blueprint (untouched) ──────────────────────────── #
     auth_routes = Authroutes()
     app.register_blueprint(auth_routes.login())
 
-    # ── PUBLIC ──────────────────────────────────────────────
+    # ── Admin API blueprint (new — prefix /api/admin, no clash) ────────── #
+    from app.routes.admin import admin_bp
+    app.register_blueprint(admin_bp)
+
+    # ── PUBLIC ──────────────────────────────────────────────────────────── #
 
     @app.route("/")
     def home():
@@ -290,3 +295,4 @@ def create_app():
         return render_template("error.html"), 404
 
     return app
+
