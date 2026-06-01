@@ -16,28 +16,57 @@ class User(BaseModel):
     """
 
     table = "users"
-
-    def __init__(self, name="", email="", password="", role="customer"):
+    
+    
+    def __init__(self, name="", email="", password="", role="customer", security_answer=""):
         self.id = None
         self.name = name
         self.email = email
         self.__password = password
         self.role = role
+        self.__security_answer = security_answer  # plain text, hashed on save
         self.created_at = None
-
-    # ── Teammate's methods (untouched) ───────────────────────────────── #
-
-    def save(self):
-        """Save user to database with hashed password."""
+    
+    def delete_account(self):
+        """Permanently delete this user from the database by email."""
         db = Database()
-        hashed_password = generate_password_hash(self.__password)
-        query = (
-            f"INSERT INTO {self.table} (name, email, password, role) "
-            f"VALUES (%s, %s, %s, %s)"
-        )
-        db.execute(query, (self.name, self.email, hashed_password, self.role))
+        query = f"DELETE FROM {self.table} WHERE email=%s"
+        db.execute(query, (self.email,))
+        db.close()
+        
+    def check_security_answer(self, plain_answer):
+        """Check if the given security answer matches the stored hash (by email)."""
+        db = Database()
+        query = f"SELECT security_answer FROM {self.table} WHERE email=%s"
+        result = db.fetch_one(query, (self.email,))
         db.close()
 
+        if not result or not result['security_answer']:
+            return False
+        return check_password_hash(result['security_answer'], plain_answer.strip().lower())
+    
+    
+    def save(self):
+            """Save user to database with hashed password and hashed security answer"""
+            db = Database()
+
+            hashed_password = generate_password_hash(self.__password)
+            hashed_answer = generate_password_hash(self.__security_answer.strip().lower())
+
+            query = (
+                f"INSERT INTO {self.table} (name, email, password, role, security_answer) "
+                f"VALUES (%s, %s, %s, %s, %s)"
+            )
+            db.execute(query, (self.name, self.email, hashed_password, self.role, hashed_answer))
+            db.close()
+    
+    def update_profile_info(self, name, phone, address):
+        """Update name, phone, and address by email (email stays the login key)."""
+        db = Database()
+        query = f"UPDATE {self.table} SET name=%s, phone=%s, address=%s WHERE email=%s"
+        db.execute(query, (name, phone, address, self.email))
+        db.close()
+    
     def update(self):
         """Update user in database."""
         db = Database()
@@ -61,7 +90,16 @@ class User(BaseModel):
         self.name = name
         self.email = email
         self.update()
-
+    
+    def update_password(self, new_password):
+        """Update the user's password (hashed) by email."""
+        db = Database()
+        hashed_password = generate_password_hash(new_password)
+        query = f"UPDATE {self.table} SET password=%s WHERE email=%s"
+        db.execute(query, (hashed_password, self.email))
+        db.close()
+    
+    
     def email_exists(self):
         """Check if email already exists in database."""
         db = Database()
