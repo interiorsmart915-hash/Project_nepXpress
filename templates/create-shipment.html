@@ -11,11 +11,29 @@
 </head>
 <body>
 
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          <span>{{ message }}</span>
+          <button onclick="this.parentElement.style.display='none';">×</button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
   <!-- ── SIDEBAR: left navigation panel ── -->
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="NepXpress" class="sidebar-logo" />
-      <span class="sidebar-tagline">Logistics Management</span>
+      <div class="brand">
+        <div class="brand-icon">
+          <img src="{{ url_for('static', filename='mainlogo.png') }}" alt="NepXpress Logo" class="brand-logo"/>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">NepXpress</div>
+          <div class="brand-sub-text">Logistics & Delivery</div>
+        </div>
+      </div>
     </div>
 
     <nav class="sidebar-nav">
@@ -43,10 +61,10 @@
 
     <!-- Logged-in user shown at the bottom of the sidebar -->
     <div class="sidebar-user">
-      <div class="user-avatar">JD</div>
+      <div class="user-avatar">{{ (user_name[0] if user_name else 'U') | upper }}</div>
       <div class="user-info">
-        <span class="user-name">John Doe</span>
-        <span class="user-role">Customer</span>
+        <span class="user-name">{{ user_name if user_name else 'User' }}</span>
+        <span class="user-role">{{ user_role | capitalize if user_role else 'Customer' }}</span>
       </div>
     </div>
   </aside>
@@ -65,6 +83,7 @@
     </header>
 
     <main class="content">
+      <form method="POST" action="{{ url_for('create_shipment') }}">
       <!-- form-grid: 2-column layout; full-width cards span both columns -->
       <div class="form-grid">
 
@@ -73,21 +92,21 @@
           <h2 class="card-title">Sender Information</h2>
           <div class="form-group">
             <label>Full Name</label>
-            <input type="text" id="senderName" placeholder="Enter sender's full name" />
+            <input type="text" id="senderName" name="sender_name" placeholder="Enter sender's full name" />
           </div>
           <div class="form-group">
             <label>Phone Number</label>
-            <input type="tel" placeholder="+977 98XXXXXXXX" />
+            <input type="tel" name="sender_phone" placeholder="+977 98XXXXXXXX" />
           </div>
           <div class="form-group">
             <label>Pickup Address</label>
-            <input type="text" placeholder="Street address, area" />
+            <input type="text" name="sender_address" placeholder="Street address, area" />
           </div>
           <!-- City and District side by side -->
           <div class="form-row">
             <div class="form-group">
               <label>City</label>
-              <select>
+              <select name="sender_city">
                 <option value="">Select city</option>
                 <option>Kathmandu</option>
                 <option>Lalitpur</option>
@@ -98,7 +117,7 @@
             </div>
             <div class="form-group">
               <label>District</label>
-              <input type="text" placeholder="District" />
+              <input type="text" name="sender_district" placeholder="District" />
             </div>
           </div>
         </section>
@@ -108,21 +127,21 @@
           <h2 class="card-title">Receiver Information</h2>
           <div class="form-group">
             <label>Full Name</label>
-            <input type="text" id="receiverName" placeholder="Enter receiver's full name" />
+            <input type="text" id="receiverName" name="receiver_name" placeholder="Enter receiver's full name" />
           </div>
           <div class="form-group">
             <label>Phone Number</label>
-            <input type="tel" placeholder="+977 98XXXXXXXX" />
+            <input type="tel" name="receiver_phone" placeholder="+977 98XXXXXXXX" />
           </div>
           <div class="form-group">
             <label>Delivery Address</label>
-            <input type="text" placeholder="Street address, area" />
+            <input type="text" name="receiver_address" placeholder="Street address, area" />
           </div>
           <!-- City and District side by side -->
           <div class="form-row">
             <div class="form-group">
               <label>City</label>
-              <select>
+              <select name="receiver_city">
                 <option value="">Select city</option>
                 <option>Kathmandu</option>
                 <option>Lalitpur</option>
@@ -133,7 +152,7 @@
             </div>
             <div class="form-group">
               <label>District</label>
-              <input type="text" placeholder="District" />
+              <input type="text" name="receiver_district" placeholder="District" />
             </div>
           </div>
         </section>
@@ -146,7 +165,7 @@
           <div class="form-row three-col">
             <div class="form-group">
               <label>Package Type</label>
-              <select>
+              <select name="package_type">
                 <option value="">Select type</option>
                 <option>Document</option>
                 <option>Parcel</option>
@@ -158,11 +177,11 @@
             </div>
             <div class="form-group">
               <label>Weight (kg)</label>
-              <input type="number" placeholder="0.0" min="0" step="0.1" />
+              <input type="number" name="weight" placeholder="0.0" min="0" step="0.1" />
             </div>
             <div class="form-group">
               <label>Estimated Value (NPR)</label>
-              <input type="number" placeholder="0" min="0" />
+              <input type="number" name="value" placeholder="0" min="0" />
             </div>
           </div>
 
@@ -185,7 +204,7 @@
           <!-- Free text for any special handling notes -->
           <div class="form-group">
             <label>Special Instructions</label>
-            <textarea placeholder="Handle with care, keep upright, etc."></textarea>
+            <textarea name="instructions" placeholder="Handle with care, keep upright, etc."></textarea>
           </div>
         </section>
 
@@ -194,26 +213,26 @@
           <h2 class="card-title">Delivery Options</h2>
           <div class="delivery-options">
             <label class="option-card selected">
-              <input type="radio" name="delivery" value="standard" checked />
+              <input type="radio" name="delivery_type" value="Standard" checked />
               <div class="option-info">
                 <div class="option-name">Standard Delivery</div>
-                <div class="option-desc">2–4 business days</div>
+                <div class="option-desc">3–5 business days</div>
               </div>
               <div class="option-price">NPR 150</div>
             </label>
             <label class="option-card">
-              <input type="radio" name="delivery" value="express" />
+              <input type="radio" name="delivery_type" value="Express" />
               <div class="option-info">
                 <div class="option-name">Express Delivery</div>
-                <div class="option-desc">Same day delivery</div>
+                <div class="option-desc">1–2 business days</div>
               </div>
               <div class="option-price">NPR 350</div>
             </label>
             <label class="option-card">
-              <input type="radio" name="delivery" value="overnight" />
+              <input type="radio" name="delivery_type" value="Same-day" />
               <div class="option-info">
-                <div class="option-name">Overnight Delivery</div>
-                <div class="option-desc">Next morning by 9 AM</div>
+                <div class="option-name">Same-day Delivery</div>
+                <div class="option-desc">Delivered today</div>
               </div>
               <div class="option-price">NPR 500</div>
             </label>
@@ -225,22 +244,22 @@
           <h2 class="card-title">Payment Method</h2>
           <div class="payment-options">
             <label class="payment-card selected">
-              <input type="radio" name="payment" value="cod" checked />
+              <input type="radio" name="payment_method" value="cod" checked />
               <span class="pay-icon">💵</span>
               <span>Cash on Delivery</span>
             </label>
             <label class="payment-card">
-              <input type="radio" name="payment" value="esewa" />
+              <input type="radio" name="payment_method" value="esewa" />
               <span class="pay-icon">📱</span>
               <span>eSewa</span>
             </label>
             <label class="payment-card">
-              <input type="radio" name="payment" value="khalti" />
+              <input type="radio" name="payment_method" value="khalti" />
               <span class="pay-icon">💳</span>
               <span>Khalti</span>
             </label>
             <label class="payment-card">
-              <input type="radio" name="payment" value="bank" />
+              <input type="radio" name="payment_method" value="bank" />
               <span class="pay-icon">🏦</span>
               <span>Bank Transfer</span>
             </label>
@@ -256,10 +275,11 @@
           <div class="summary-amount">NPR 150</div>
         </div>
         <div class="summary-actions">
-          <button class="btn-outline" id="saveDraftBtn">Save as Draft</button>
-          <button class="btn-primary" id="confirmBtn">Confirm &amp; Create Shipment</button>
+          <button type="button" class="btn-outline" id="saveDraftBtn">Save as Draft</button>
+          <button type="submit" class="btn-primary" id="confirmBtn">Confirm &amp; Create Shipment</button>
         </div>
       </div>
+      </form>
     </main>
   </div>
 
@@ -293,18 +313,14 @@
       alert('Shipment saved as draft!');
     });
 
-    // Confirm — validate sender/receiver names before submitting
-    document.getElementById('confirmBtn').addEventListener('click', function() {
+    // Confirm — validate sender/receiver names before the form submits
+    document.getElementById('confirmBtn').addEventListener('click', function(e) {
       var senderName = document.getElementById('senderName').value;
       var receiverName = document.getElementById('receiverName').value;
-
-      if (senderName === '' || receiverName === '') {
+      if (senderName.trim() === '' || receiverName.trim() === '') {
+        e.preventDefault();
         alert('Please fill in sender and receiver names before submitting.');
-        return;
       }
-
-      alert('Shipment created successfully! Redirecting to history...');
-      // window.location.href = '/shipment-history';
     });
   </script>
 

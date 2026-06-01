@@ -13,9 +13,16 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div class="sidebar-brand">
-      <img src="{{ url_for('static', filename='logo.png') }}" alt="NepXpress" class="sidebar-logo" />
-      <span class="sidebar-tagline">Logistics Management</span>
+<div class="sidebar-brand">
+      <div class="brand">
+        <div class="brand-icon">
+          <img src="{{ url_for('static', filename='mainlogo.png') }}" alt="NepXpress Logo" class="brand-logo"/>
+        </div>
+        <div class="brand-text">
+          <div class="brand-name">NepXpress</div>
+          <div class="brand-sub-text">Logistics & Delivery</div>
+        </div>
+      </div>
     </div>
 
     <nav class="sidebar-nav">
@@ -41,11 +48,11 @@
       </a>
     </nav>
 
-    <div class="sidebar-user">
-      <div class="user-avatar">JD</div>
+<div class="sidebar-user">
+      <div class="user-avatar">{{ (user_name[0] if user_name else 'U') | upper }}</div>
       <div class="user-info">
-        <span class="user-name">John Doe</span>
-        <span class="user-role">Customer</span>
+        <span class="user-name">{{ user_name if user_name else 'User' }}</span>
+        <span class="user-role">{{ user_role | capitalize if user_role else 'Customer' }}</span>
       </div>
     </div>
   </aside>

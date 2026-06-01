@@ -1,6 +1,7 @@
-from flask import Flask, render_template, session, redirect, url_for, flash, request, get_flashed_messages, make_response
+from flask import Flask, app, render_template, session, redirect, url_for, flash, request, get_flashed_messages, make_response
 from app.routes.authroutes import Authroutes
 from app.models.database import Database
+from app.models.ShipmentModel import Shipment
 from app.models.UserModel import User
 from functools import wraps
 import config
@@ -101,20 +102,63 @@ def create_app():
             user_name=session.get("user_name"),
             user_role=session.get("user_role")
         )
-
-    @app.route("/create-shipment")
+    @app.route("/create-shipment", methods=["GET", "POST"])
     @login_required
     @no_cache
     def create_shipment():
+        if request.method == "POST":
+            sender_name = request.form.get("sender_name", "").strip()
+            receiver_name = request.form.get("receiver_name", "").strip()
+            delivery_type = request.form.get("delivery_type", "").strip()
+
+            # delivery type is required and must be one of the allowed values
+            allowed_types = ["Standard", "Express", "Same-day"]
+            if not sender_name or not receiver_name:
+                flash("Sender and receiver names are required.", "danger")
+                return redirect(url_for("create_shipment"))
+            if delivery_type not in allowed_types:
+                flash("Please select a valid delivery type.", "danger")
+                return redirect(url_for("create_shipment"))
+
+            shipment = Shipment()
+            tracking_id = Shipment.generate_tracking_id()
+            shipment.create({
+                "tracking_id": tracking_id,
+                "user_id": session.get("user_id"),
+                "sender_name": sender_name,
+                "sender_phone": request.form.get("sender_phone", "").strip(),
+                "sender_address": request.form.get("sender_address", "").strip(),
+                "sender_city": request.form.get("sender_city", "").strip(),
+                "receiver_name": receiver_name,
+                "receiver_phone": request.form.get("receiver_phone", "").strip(),
+                "receiver_address": request.form.get("receiver_address", "").strip(),
+                "receiver_city": request.form.get("receiver_city", "").strip(),
+                "package_type": request.form.get("package_type", "").strip(),
+                "weight": request.form.get("weight") or 0,
+                "delivery_type": delivery_type,
+                "payment_method": request.form.get("payment_method", "").strip(),
+                "status": "Pending",
+            })
+            flash(f"Shipment created! Tracking ID: {tracking_id}", "success")
+            return redirect(url_for("shipment_history"))
+
         get_flashed_messages()
-        return render_template("create-shipment.html")
+        return render_template(
+            "create-shipment.html",
+            user_name=session.get("user_name"),
+            user_role=session.get("user_role")
+        )
 
     @app.route("/shipment-history")
     @login_required
     @no_cache
     def shipment_history():
         get_flashed_messages()
-        return render_template("shipment-history.html")
+        return render_template(
+            "shipment-history.html",
+            user_name=session.get("user_name"),
+            user_role=session.get("user_role")
+        )
 
     @app.route("/settings", methods=["GET", "POST"])
     @login_required
@@ -125,7 +169,6 @@ def create_app():
 
         if request.method == "POST":
             form_type = request.form.get("form_type", "")
-
             if form_type == "profile":
                 name = request.form.get("name", "").strip()
                 phone = request.form.get("phone", "").strip()
@@ -174,7 +217,11 @@ def create_app():
             flash("You don't have permission to access this page.", "danger")
             return redirect(url_for("dashboard"))
         get_flashed_messages()
-        return render_template("admin-dashboard.html")
+        return render_template(
+            "admin-dashboard.html",
+            user_name=session.get("user_name"),
+            user_role=session.get("user_role")
+        )
 
     @app.route("/logout", methods=["GET", "POST"])
     @login_required

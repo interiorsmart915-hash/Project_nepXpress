@@ -26,12 +26,7 @@ class Authroutes:
             view_func=self.controller.logout,
             methods=["GET", "POST"]
         )
-        self.bp.add_url_rule(
-            "/settings",
-            endpoint="settings",
-            view_func=self.controller.settings,
-            methods=["GET", "POST"]
-        )
+        
         self.bp.add_url_rule(
             "/base",
             endpoint="base",
