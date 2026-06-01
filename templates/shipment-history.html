@@ -6,7 +6,6 @@
   <title>Shipment History - NepXpress</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="{{ url_for('static', filename='common.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='admin-dashboard.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='shipment-history.css') }}" />
 </head>
 <body>
@@ -73,14 +72,14 @@
     <main class="content">
 
       <!-- PAGE HEADER -->
-      <div class="page-header">
-        <div>
-          <h1 class="page-title">Shipment History</h1>
-          <p class="page-sub">View and manage all your past deliveries</p>
-        </div>
-        <button class="btn-primary" onclick="window.location.href='/create-shipment'">+ Create New Shipment</button>
-      </div>
-
+<!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">All Shipments</h1>
+      <p class="page-sub">View and manage all your past deliveries</p>
+    </div>
+    <button class="btn-primary" onclick="window.location.href='/create-shipment'">+ Create New Shipment</button>
+  </div>
       <!-- STATS -->
       <div class="stats-row">
         <div class="stat-card">

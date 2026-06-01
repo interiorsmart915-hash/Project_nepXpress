@@ -112,6 +112,11 @@ def create_app():
             receiver_name = request.form.get("receiver_name", "").strip()
             delivery_type = request.form.get("delivery_type", "").strip()
 
+            # Only Cash on Delivery is supported for now — force it regardless of what was submitted
+            payment_method = request.form.get("payment_method", "cod").strip()
+            if payment_method != "cod":
+                payment_method = "cod"
+
             # delivery type is required and must be one of the allowed values
             allowed_types = ["Standard", "Express", "Same-day"]
             if not sender_name or not receiver_name:
@@ -120,6 +125,10 @@ def create_app():
             if delivery_type not in allowed_types:
                 flash("Please select a valid delivery type.", "danger")
                 return redirect(url_for("create_shipment"))
+
+            # Server-side price lookup based on delivery type
+            delivery_prices = {"Standard": 150, "Express": 350, "Same-day": 500}
+            delivery_cost = delivery_prices.get(delivery_type, 0)
 
             shipment = Shipment()
             tracking_id = Shipment.generate_tracking_id()
@@ -144,10 +153,10 @@ def create_app():
                 "height_cm": request.form.get("height") or None,
                 "instructions": request.form.get("instructions", "").strip(),
                 "delivery_type": delivery_type,
-                "payment_method": request.form.get("payment_method", "").strip(),
+                "payment_method": payment_method,
                 "status": "Pending",
             })
-            flash(f"Shipment created! Tracking ID: {tracking_id}", "success")
+            flash(f"Shipment created! Tracking ID: {tracking_id} — Total: NPR {delivery_cost}", "success")
             return redirect(url_for("shipment_history"))
 
         get_flashed_messages()
@@ -301,4 +310,3 @@ def create_app():
       return {"session": dict(session), "routes": rules}
 
     return app
-

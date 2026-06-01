@@ -42,15 +42,6 @@ class Shipment(BaseModel):
             data["delivery_type"], data["payment_method"], data["status"],
         ))
         db.close()
-        db.execute(query, (
-            data["tracking_id"], data["user_id"],
-            data["sender_name"], data["sender_phone"], data["sender_address"], data["sender_city"], data["sender_district"],
-            data["receiver_name"], data["receiver_phone"], data["receiver_address"], data["receiver_city"], data["receiver_district"],
-            data["package_type"], data["weight"], data["estimated_value"],
-            data["length_cm"], data["width_cm"], data["height_cm"], data["instructions"],
-            data["delivery_type"], data["payment_method"], data["status"],
-        ))
-        db.close()
 
     def find_by_user(self, user_id):
         """Get all shipments for a user, newest first."""
