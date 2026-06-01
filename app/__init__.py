@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session, redirect, url_for, flash, request, get_flashed_messages, make_response
+from flask import Flask, app, render_template, session, redirect, url_for, flash, request, get_flashed_messages, make_response
 from app.routes.authroutes import Authroutes
 from app.models.database import Database
 from app.models.UserModel import User
@@ -96,20 +96,27 @@ def create_app():
             user_name=session.get("user_name"),
             user_role=session.get("user_role")
         )
-
     @app.route("/create-shipment")
     @login_required
     @no_cache
     def create_shipment():
         get_flashed_messages()
-        return render_template("create-shipment.html")
+        return render_template(
+            "create-shipment.html",
+            user_name=session.get("user_name"),
+            user_role=session.get("user_role")
+        )
 
     @app.route("/shipment-history")
     @login_required
     @no_cache
     def shipment_history():
         get_flashed_messages()
-        return render_template("shipment-history.html")
+        return render_template(
+            "shipment-history.html",
+            user_name=session.get("user_name"),
+            user_role=session.get("user_role")
+        )
 
     @app.route("/settings", methods=["GET", "POST"])
     @login_required
@@ -120,7 +127,6 @@ def create_app():
 
         if request.method == "POST":
             form_type = request.form.get("form_type", "")
-
             if form_type == "profile":
                 name = request.form.get("name", "").strip()
                 phone = request.form.get("phone", "").strip()
@@ -169,7 +175,11 @@ def create_app():
             flash("You don't have permission to access this page.", "danger")
             return redirect(url_for("dashboard"))
         get_flashed_messages()
-        return render_template("admin-dashboard.html")
+        return render_template(
+            "admin-dashboard.html",
+            user_name=session.get("user_name"),
+            user_role=session.get("user_role")
+        )
 
     @app.route("/logout", methods=["GET", "POST"])
     @login_required

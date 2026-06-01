@@ -42,11 +42,11 @@
     </nav>
 
     <!-- Logged-in user shown at the bottom of the sidebar -->
-    <div class="sidebar-user">
-      <div class="user-avatar">JD</div>
+<div class="sidebar-user">
+      <div class="user-avatar">{{ (user_name[0] if user_name else 'U') | upper }}</div>
       <div class="user-info">
-        <span class="user-name">John Doe</span>
-        <span class="user-role">Customer</span>
+        <span class="user-name">{{ user_name if user_name else 'User' }}</span>
+        <span class="user-role">{{ user_role | capitalize if user_role else 'Customer' }}</span>
       </div>
     </div>
   </aside>

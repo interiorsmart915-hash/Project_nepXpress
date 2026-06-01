@@ -22,7 +22,7 @@
       {% endfor %}
     {% endif %}
   {% endwith %}
-  <!-- ── SIDEBAR: left navigation panel ── -->
+
   <aside class="sidebar">
     <div class="sidebar-brand">
       <img src="{{ url_for('static', filename='logo.png') }}" alt="NepXpress" class="sidebar-logo" />
@@ -52,8 +52,7 @@
       </a>
     </nav>
 
-    <!-- Logged-in user info shown at bottom of sidebar -->
-<div class="sidebar-user">
+    <div class="sidebar-user">
       <div class="user-avatar">{{ (user_name[0] if user_name else 'U') | upper }}</div>
       <div class="user-info">
         <span class="user-name">{{ user_name if user_name else 'User' }}</span>
@@ -62,7 +61,6 @@
     </div>
   </aside>
 
-  <!-- ── MAIN CONTENT ── -->
   <main class="main">
 
     <div class="page-header">
@@ -72,11 +70,8 @@
       </div>
     </div>
 
-    <!-- 2-column grid: each section is a card -->
     <div class="settings-grid">
 
-      <!-- CARD 1: Edit profile info -->
-<!-- CARD 1: Edit profile info -->
       <section class="card">
         <div class="card-head">
           <div class="card-icon">👤</div>
@@ -106,8 +101,7 @@
           <button type="submit" class="btn-primary">Save Changes</button>
         </form>
       </section>
-      <!--            CARD 2: Change password        -->
-<!--            CARD 2: Change password        -->
+
       <section class="card">
         <div class="card-head">
           <div class="card-icon">🔒</div>
@@ -134,7 +128,6 @@
         </form>
       </section>
 
-      <!-- CARD 3: Destructive actions — logout and delete -->
       <section class="card danger-card full-width">
         <div class="card-head">
           <div class="card-icon">⚠️</div>
@@ -165,13 +158,11 @@
     </div>
   </main>
 
-  <!-- ── JAVASCRIPT: button actions ── -->
-<script>
+  <script>
     document.getElementById('logoutBtn').addEventListener('click', function() {
       window.location.href = '/logout';
     });
 
-    // Delete account — first confirm, then go to password-confirmation page
     document.getElementById('deleteAccountBtn').addEventListener('click', function() {
       if (confirm('This will permanently delete your account. Continue?')) {
         window.location.href = '/delete-account';
