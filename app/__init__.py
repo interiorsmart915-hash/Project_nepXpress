@@ -249,31 +249,16 @@ def create_app():
         user_role=session.get("user_role") or session.get("admin_role")
     )
     
-
     @app.route("/logout", methods=["GET", "POST"])
     @login_required
     def logout():
         get_flashed_messages()
-        if request.method == "GET":
-            return render_template("logout.html")
         if request.method == "POST":
-            password = request.form.get("password", "").strip()
-            if not password:
-                flash("Password is required to logout.", "danger")
-                return render_template("logout.html")
-            user_email = session.get("user_email")
-            user = User(email=user_email)
-            user_data = user.find_by("email", user_email)
-            if not user_data:
-                flash("User not found.", "danger")
-                return render_template("logout.html")
-            if not user.check_password(password):
-                flash("Incorrect password. Please try again.", "danger")
-                return render_template("logout.html")
             session.clear()
             flash("You have been logged out successfully.", "success")
             return redirect(url_for("auth.login"))
-        
+        return render_template("logout.html")
+    
     @app.route("/forgot-password", methods=["GET", "POST"])
     def forgot_password():
             if request.method == "GET":
