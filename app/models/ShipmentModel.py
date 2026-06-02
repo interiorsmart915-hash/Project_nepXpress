@@ -1,9 +1,13 @@
 from app.models.BaseModel import BaseModel
-from app.models.database import Database
+from app.models.database import Database, execute_query
 import random
 
 
 class Shipment(BaseModel):
+    """
+    Teammate's Shipment class — kept exactly as-is.
+    Used by the customer-facing create-shipment page.
+    """
     table = "shipments"
 
     def __init__(self):
@@ -31,8 +35,12 @@ class Shipment(BaseModel):
             "VALUES (%s,%s,%s,%s,%s,%s)"
         )
         db.execute(query, (
-            data["tracking_id"], data["customer_id"],
-            data["destination"], data.get("status", "pending"), data.get("amount", 0.00), data.get("notes", ""),
+            data["tracking_id"], data["user_id"],
+            data["sender_name"], data["sender_phone"], data["sender_address"], data["sender_city"], data["sender_district"],
+            data["receiver_name"], data["receiver_phone"], data["receiver_address"], data["receiver_city"], data["receiver_district"],
+            data["package_type"], data["weight"], data["estimated_value"],
+            data["length_cm"], data["width_cm"], data["height_cm"], data["instructions"],
+            data["delivery_type"], data["payment_method"], data["status"],
         ))
         db.close()
 
@@ -45,29 +53,3 @@ class Shipment(BaseModel):
         )
         db.close()
         return results
-
-    def get_stats_for_user(self, user_id):
-        """Return counts per status for the stats cards on the history page."""
-        db = Database()
-        rows = db.fetch_all(
-            "SELECT status, COUNT(*) AS cnt "
-            "FROM shipments WHERE customer_id=%s GROUP BY status",
-            (user_id,)
-        )
-        db.close()
-        stats = {"total": 0, "Delivered": 0, "In Transit": 0, "Processing": 0}
-        # Map DB enum values → display labels
-        label_map = {
-            "delivered":   "Delivered",
-            "in_transit":  "In Transit",
-            "processing":  "Processing",
-            "pending":     "Processing",   # treat pending as processing for display
-            "delayed":     "In Transit",   # delayed still counts as in-transit for display
-            "cancelled":   "Cancelled",
-        }
-        for row in rows:
-            stats["total"] += row["cnt"]
-            label = label_map.get(row["status"].lower(), "")
-            if label and label in stats:
-                stats[label] += row["cnt"]
-        return stats
