@@ -1,171 +1,187 @@
-"""
-=============================================================
-  OOP Concept: INHERITANCE, ENCAPSULATION & POLYMORPHISM
-=============================================================
-  - Inheritance: User inherits from BaseModel, so it gets find_by_id(), find_all(), delete_by_id() for FREE.
-  - Encapsulation: Password is kept private (__password). Outside code cannot access user.__password directly.
-    We use a setter method to control how it's changed.
-  - Polymorphism: User defines its own 'table' property, which overrides the abstract one from BaseModel.
-    Same interface, different behavior = polymorphism.
-=============================================================
-"""
-
-from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.BaseModel import BaseModel
-from .database import Database
+from app.models.database import Database, execute_query
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(BaseModel):
     """
-    User Model — represents a single user in our app.
+    Teammate's User class kept exactly as-is.
+    - Class name: User  (not UserModel)
+    - Password column: 'password'  (not 'password_hash')
+    - Hashing: werkzeug  (not SHA-256)
 
-    Inherits from BaseModel:
-      - find_by_id(id)
-      - find_by(column, value)
-      - find_all()
-      - count_all()
-      - delete_by_id(id)
+    Admin dashboard class methods added at the bottom —
+    they are prefixed with 'admin_' to make it clear they
+    belong to the admin backend, not the customer-facing app.
     """
 
-    # ── Polymorphism: Override the abstract 'table' property ──
-    @property
-    def table(self):
-        """Tell BaseModel which database table to use."""
-        return "users"
-
-    # ── Constructor ─────────────────────────────────────────
-    def __init__(self, name=None, email=None, password=None, role="user"):
-        """
-        Create a User object.
-
-        Encapsulation:
-          - __password is PRIVATE (double underscore).
-          - It can only be set through set_password().
-          - This protects the password from accidental access.
-        """
+    table = "users"
+    
+    
+    def __init__(self, name="", email="", password="", role="customer", security_answer=""):
+        self.id = None
         self.name = name
         self.email = email
-        self.__password = None
+        self.__password = password
         self.role = role
+        self.__security_answer = security_answer  # plain text, hashed on save
+        self.created_at = None
+    
+    def delete_account(self):
+        """Permanently delete this user from the database by email."""
+        db = Database()
+        query = f"DELETE FROM {self.table} WHERE email=%s"
+        db.execute(query, (self.email,))
+        db.close()
+        
+    def check_security_answer(self, plain_answer):
+        """Check if the given security answer matches the stored hash (by email)."""
+        db = Database()
+        query = f"SELECT security_answer FROM {self.table} WHERE email=%s"
+        result = db.fetch_one(query, (self.email,))
+        db.close()
 
-        # Hash the password if one was provided
-        if password:
-            self.set_password(password)
+        if not result or not result['security_answer']:
+            return False
+        return check_password_hash(result['security_answer'], plain_answer.strip().lower())
+    
+    
+    def save(self):
+            """Save user to database with hashed password and hashed security answer"""
+            db = Database()
 
-    # ── Encapsulation: Password Methods ─────────────────────
+            hashed_password = generate_password_hash(self.__password)
+            hashed_answer = generate_password_hash(self.__security_answer.strip().lower())
 
-    def set_password(self, plain_password):
-        """
-        Hash and store the password securely.
-        This is the ONLY way to set a password — encapsulation!
-        """
-        self.__password = generate_password_hash(plain_password)
+            query = (
+                f"INSERT INTO {self.table} (name, email, password, role, security_answer) "
+                f"VALUES (%s, %s, %s, %s, %s)"
+            )
+            db.execute(query, (self.name, self.email, hashed_password, self.role, hashed_answer))
+            db.close()
+    
+    def update_profile_info(self, name, phone, address):
+        """Update name, phone, and address by email (email stays the login key)."""
+        db = Database()
+        query = f"UPDATE {self.table} SET name=%s, phone=%s, address=%s WHERE email=%s"
+        db.execute(query, (name, phone, address, self.email))
+        db.close()
+    
+    def update(self):
+        """Update user in database."""
+        db = Database()
+        if self.__password:
+            hashed_password = generate_password_hash(self.__password)
+            query = (
+                f"UPDATE {self.table} SET name=%s, email=%s, password=%s, role=%s "
+                f"WHERE id=%s"
+            )
+            db.execute(query, (self.name, self.email, hashed_password, self.role, self.id))
+        else:
+            query = (
+                f"UPDATE {self.table} SET name=%s, email=%s, role=%s "
+                f"WHERE id=%s"
+            )
+            db.execute(query, (self.name, self.email, self.role, self.id))
+        db.close()
+
+    def update_profile(self, name, email):
+        """Update user profile (name and email only)."""
+        self.name = name
+        self.email = email
+        self.update()
+    
+    def update_password(self, new_password):
+        """Update the user's password (hashed) by email."""
+        db = Database()
+        hashed_password = generate_password_hash(new_password)
+        query = f"UPDATE {self.table} SET password=%s WHERE email=%s"
+        db.execute(query, (hashed_password, self.email))
+        db.close()
+    
+    
+    def email_exists(self):
+        """Check if email already exists in database."""
+        db = Database()
+        query = f"SELECT COUNT(*) as count FROM {self.table} WHERE email=%s"
+        result = db.fetch_one(query, (self.email,))
+        db.close()
+        return result['count'] > 0
+
+    def find_by(self, field, value):
+        """Find user by a specific field."""
+        db = Database()
+        query = f"SELECT * FROM {self.table} WHERE {field}=%s"
+        result = db.fetch_one(query, (value,))
+        db.close()
+        return result
 
     def check_password(self, plain_password):
-        """Check if the given password matches the stored hash."""
-        if self.__password is None:
+        """Check if plain password matches the hashed password in database."""
+        db = Database()
+        query = f"SELECT password FROM {self.table} WHERE email=%s"
+        result = db.fetch_one(query, (self.email,))
+        db.close()
+        if not result:
             return False
-        return check_password_hash(self.__password, plain_password)
-
-    # ── Create: Save a new user to the database ─────────────
-
-    def save(self):
-        """Insert this user into the database."""
-        db = Database()
-        db.execute(
-            "INSERT INTO users (name, email, password, role) VALUES (%s, %s, %s, %s)",
-            (self.name, self.email, self.__password, self.role),
-        )
-        db.close()
-
-    # ── Update: Modify an existing user ─────────────────────
-
-    def update(self, user_id, update_password=False):
-        """
-        Update user in database.
-        If update_password=True, the password is also updated.
-        """
-        db = Database()
-        if update_password:
-            db.execute(
-                "UPDATE users SET name=%s, email=%s, password=%s, role=%s WHERE id=%s",
-                (self.name, self.email, self.__password, self.role, user_id),
-            )
-        else:
-            db.execute(
-                "UPDATE users SET name=%s, email=%s, role=%s WHERE id=%s",
-                (self.name, self.email, self.role, user_id),
-            )
-        db.close()
-
-    def update_profile(self, user_id, update_password=False):
-        """
-        Update profile (name, email, and optionally password).
-        Used when a user edits their own profile (no role change).
-        """
-        db = Database()
-        if update_password:
-            db.execute(
-                "UPDATE users SET name=%s, email=%s, password=%s WHERE id=%s",
-                (self.name, self.email, self.__password, user_id),
-            )
-        else:
-            db.execute(
-                "UPDATE users SET name=%s, email=%s WHERE id=%s",
-                (self.name, self.email, user_id),
-            )
-        db.close()
-
-    # ── Helper: Check if email is already taken ─────────────
-
-    def email_exists(self, exclude_id=None):
-        """
-        Check if this user's email is already in the database.
-        exclude_id: ignore this user ID (useful when updating).
-        """
-        db = Database()
-        if exclude_id:
-            result = db.fetch_one(
-                "SELECT id FROM users WHERE email = %s AND id != %s",
-                (self.email, exclude_id),
-            )
-        else:
-            result = db.fetch_one(
-                "SELECT id FROM users WHERE email = %s", (self.email,)
-            )
-        db.close()
-        return result is not None
-
-    # ── Class Method: Build a User object from DB data ──────
+        return check_password_hash(result['password'], plain_password)
 
     @classmethod
-    def from_db(cls, data):
-        """
-        Create a User object from a database dictionary.
-
-        @classmethod means you call it on the class itself:
-            user = User.from_db(row)
-        instead of creating an instance first.
-        """
-        if data is None:
-            return None
+    def from_db(cls, db_row):
+        """Create User object from database row."""
         user = cls()
-        user.name = data["name"]
-        user.email = data["email"]
-        user.__password = data["password"]
-        user.role = data["role"]
+        user.id = db_row['id']
+        user.name = db_row['name']
+        user.email = db_row['email']
+        user._User__password = db_row['password']
+        user.role = db_row['role']
+        user.created_at = db_row['created_at']
         return user
 
-    # ── Magic Method: String representation ─────────────────
+    # ── Admin dashboard helpers (new) ────────────────────────────────── #
+    # Prefixed with 'admin_' — clearly separate from customer-facing code.
 
-    def __str__(self):
+    @classmethod
+    def admin_get_recent_customers(cls, limit=10):
+        """Recent customer registrations for the dashboard."""
+        sql = """
+            SELECT id, name, email, status, created_at
+            FROM users
+            WHERE role = 'customer'
+            ORDER BY created_at DESC
+            LIMIT %s
         """
-        Magic method: defines what print(user) shows.
-        This is Python's way of polymorphism — every class
-        can define its own __str__ behavior.
-        """
-        return f"User(name={self.name}, email={self.email}, role={self.role})"
+        return execute_query(sql, (limit,), fetchall=True)
 
-    def __repr__(self):
-        """Developer-friendly representation for debugging."""
-        return f"<User email={self.email}>"
+    @classmethod
+    def admin_get_active_count(cls):
+        """Total active customers."""
+        sql = "SELECT COUNT(*) as cnt FROM users WHERE role='customer' AND status='active'"
+        result = execute_query(sql, fetchone=True)
+        return result['cnt'] if result else 0
+
+    @classmethod
+    def admin_get_new_this_month(cls):
+        """New customer registrations this month (for % change badge)."""
+        sql = """
+            SELECT COUNT(*) as cnt FROM users
+            WHERE role = 'customer'
+              AND MONTH(created_at) = MONTH(CURDATE())
+              AND YEAR(created_at)  = YEAR(CURDATE())
+        """
+        result = execute_query(sql, fetchone=True)
+        return result['cnt'] if result else 0
+
+    @classmethod
+    def admin_verify_login(cls, email: str, plain_password: str):
+        """
+        Used by AdminAuthController only.
+        Returns the full user row if credentials are valid, else None.
+        """
+        sql = "SELECT * FROM users WHERE email = %s AND role IN ('admin','superadmin') LIMIT 1"
+        row = execute_query(sql, (email,), fetchone=True)
+        if not row:
+            return None
+        if check_password_hash(row['password'], plain_password):
+            return row
+        return None
