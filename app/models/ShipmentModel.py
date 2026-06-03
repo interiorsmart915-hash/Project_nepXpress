@@ -27,12 +27,36 @@ class Shipment(BaseModel):
         db = Database()
         query = (
             "INSERT INTO shipments "
-            "(tracking_id, customer_id, destination, status, amount, notes) "
-            "VALUES (%s,%s,%s,%s,%s,%s)"
+            "(tracking_id, user_id, sender_name, sender_phone, sender_address, "
+            " sender_city, sender_district, receiver_name, receiver_phone, "
+            " receiver_address, receiver_city, receiver_district, package_type, "
+            " weight, estimated_value, length_cm, width_cm, height_cm, "
+            " delivery_type, payment_method, status, instructions) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
         )
         db.execute(query, (
-            data["tracking_id"], data["customer_id"],
-            data["destination"], data.get("status", "pending"), data.get("amount", 0.00), data.get("notes", ""),
+            data["tracking_id"],
+            data["user_id"],
+            data.get("sender_name", ""),
+            data.get("sender_phone", ""),
+            data.get("sender_address", ""),
+            data.get("sender_city", ""),
+            data.get("sender_district", ""),
+            data.get("receiver_name", ""),
+            data.get("receiver_phone", ""),
+            data.get("receiver_address", ""),
+            data.get("receiver_city", ""),
+            data.get("receiver_district", ""),
+            data.get("package_type", ""),
+            data.get("weight") or None,
+            data.get("estimated_value") or 0,
+            data.get("length_cm") or None,
+            data.get("width_cm") or None,
+            data.get("height_cm") or None,
+            data.get("delivery_type", "Standard"),
+            data.get("payment_method", "cod"),
+            data.get("status", "Pending"),
+            data.get("instructions", ""),
         ))
         db.close()
 
@@ -40,7 +64,7 @@ class Shipment(BaseModel):
         """Get all shipments for a user, newest first."""
         db = Database()
         results = db.fetch_all(
-            "SELECT * FROM shipments WHERE customer_id=%s ORDER BY created_at DESC",
+            "SELECT * FROM shipments WHERE user_id=%s ORDER BY created_at DESC",
             (user_id,)
         )
         db.close()
@@ -51,15 +75,16 @@ class Shipment(BaseModel):
         db = Database()
         rows = db.fetch_all(
             "SELECT status, COUNT(*) AS cnt "
-            "FROM shipments WHERE customer_id=%s GROUP BY status",
+            "FROM shipments WHERE user_id=%s GROUP BY status",
             (user_id,)
         )
         db.close()
         stats = {"total": 0, "Delivered": 0, "In Transit": 0, "Processing": 0}
-        # Map DB enum values → display labels
+        # Map DB status values → display labels
         label_map = {
             "delivered":   "Delivered",
             "in_transit":  "In Transit",
+            "in transit":  "In Transit",
             "processing":  "Processing",
             "pending":     "Processing",   # treat pending as processing for display
             "delayed":     "In Transit",   # delayed still counts as in-transit for display
@@ -67,7 +92,7 @@ class Shipment(BaseModel):
         }
         for row in rows:
             stats["total"] += row["cnt"]
-            label = label_map.get(row["status"].lower(), "")
+            label = label_map.get((row["status"] or "").lower(), "")
             if label and label in stats:
                 stats[label] += row["cnt"]
         return stats
