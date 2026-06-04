@@ -1,5 +1,5 @@
 from app.models.BaseModel import BaseModel
-from app.models.database import Database
+from app.models.database import Database, execute_query
 import random
 
 
@@ -11,7 +11,6 @@ class Shipment(BaseModel):
 
     @staticmethod
     def generate_tracking_id():
-        """Generate a unique tracking ID in format NXP-NNNN-NNNN."""
         db = Database()
         while True:
             tid = f"NXP-{random.randint(1000, 9999)}-{random.randint(1000, 9999)}"
@@ -23,7 +22,6 @@ class Shipment(BaseModel):
                 return tid
 
     def create(self, data):
-        """Insert a new shipment. `data` is a dict of column->value."""
         db = Database()
         query = (
             "INSERT INTO shipments "
@@ -61,7 +59,6 @@ class Shipment(BaseModel):
         db.close()
 
     def find_by_user(self, user_id):
-        """Get all shipments for a user, newest first."""
         db = Database()
         results = db.fetch_all(
             "SELECT * FROM shipments WHERE user_id=%s ORDER BY created_at DESC",
@@ -71,7 +68,6 @@ class Shipment(BaseModel):
         return results
 
     def get_stats_for_user(self, user_id):
-        """Return counts per status for the stats cards on the history page."""
         db = Database()
         rows = db.fetch_all(
             "SELECT status, COUNT(*) AS cnt "
@@ -80,15 +76,14 @@ class Shipment(BaseModel):
         )
         db.close()
         stats = {"total": 0, "Delivered": 0, "In Transit": 0, "Processing": 0}
-        # Map DB status values → display labels
         label_map = {
-            "delivered":   "Delivered",
-            "in_transit":  "In Transit",
-            "in transit":  "In Transit",
-            "processing":  "Processing",
-            "pending":     "Processing",   # treat pending as processing for display
-            "delayed":     "In Transit",   # delayed still counts as in-transit for display
-            "cancelled":   "Cancelled",
+            "delivered":  "Delivered",
+            "in_transit": "In Transit",
+            "in transit": "In Transit",
+            "processing": "Processing",
+            "pending":    "Processing",
+            "delayed":    "In Transit",
+            "cancelled":  "Cancelled",
         }
         for row in rows:
             stats["total"] += row["cnt"]
