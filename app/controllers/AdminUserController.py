@@ -134,8 +134,8 @@ class AdminUserController(BaseController):
         try:
             data = request.get_json(silent=True) or {}
             role = (data.get('role') or '').strip()
-            if role not in ('customer', 'admin'):
-                return AdminUserController.error("Role must be 'customer' or 'admin'", 400)
+            if role not in ('customer', 'admin', 'agent'):
+                return AdminUserController.error("Role must be 'customer', 'admin', or 'agent'", 400)
 
             from flask import session
             if session.get('user_id') == user_id or session.get('admin_id') == user_id:
