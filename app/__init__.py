@@ -179,6 +179,19 @@ def create_app():
             shipments=shipments,
             stats=stats,
         )
+    
+
+    @app.route("/admin-agents")
+    @no_cache
+    def admin_agents():
+        if not session.get("user_id") and not session.get("admin_logged_in"):
+            return redirect(url_for("auth.login"))
+        get_flashed_messages()
+        return render_template(
+        "admin-agents.html",
+        user_name=session.get("user_name") or session.get("admin_name"),
+        user_role=session.get("user_role") or session.get("admin_role")
+    )
 
     @app.route("/settings", methods=["GET", "POST"])
     @login_required

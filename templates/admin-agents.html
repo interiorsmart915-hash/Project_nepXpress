@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NepXpress — Delivery Agents</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='admin-dashboard.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='admin-shipments.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='admin-users.css') }}"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='admin-agents.css') }}"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <div class="logo-icon">🚚</div>
+      <div><div class="logo-text">nep<span>Xpress</span></div></div>
+    </div>
+    <div class="logo-sub">Admin Panel</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Overview</div>
+    <a class="nav-item" href="/admin-dashboard"><span class="nav-icon">⊞</span> Dashboard</a>
+    <div class="nav-section">Management</div>
+    <a class="nav-item" href="/admin-shipments"><span class="nav-icon">📦</span> Shipments</a>
+    <a class="nav-item" href="/admin-users"><span class="nav-icon">👥</span> Users</a>
+    <a class="nav-item active" href="/admin-agents"><span class="nav-icon">🛵</span> Delivery Agents<span class="nav-badge" id="sb-total">—</span></a>
+    <div class="nav-section">Analytics</div>
+    <a class="nav-item" href="#"><span class="nav-icon">📊</span> Reports</a>
+    <a class="nav-item" href="#"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="admin-card">
+      <div class="admin-avatar" id="sb-avatar">A</div>
+      <div class="admin-info">
+        <div class="admin-name" id="sb-name">Admin</div>
+        <div class="admin-role">Administrator</div>
+      </div>
+      <div class="logout-btn" title="Logout" onclick="handleLogout()">⎋</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Delivery Agents</h1>
+      <p>Manage your delivery team</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-primary" onclick="openCreateModal()">＋ Add Agent</button>
+      <div class="topbar-avatar" id="top-avatar">A</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="ship-stats">
+      <div class="ship-stat-card">
+        <div class="ship-stat-icon" style="background:rgba(59,130,246,0.12);color:#3b82f6">🛵</div>
+        <div><div class="ship-stat-val" id="st-total">—</div><div class="ship-stat-label">Total Agents</div></div>
+      </div>
+      <div class="ship-stat-card">
+        <div class="ship-stat-icon" style="background:rgba(34,197,94,0.12);color:#22c55e">✓</div>
+        <div><div class="ship-stat-val" id="st-active">—</div><div class="ship-stat-label">Active</div></div>
+      </div>
+      <div class="ship-stat-card">
+        <div class="ship-stat-icon" style="background:rgba(139,145,168,0.12);color:#8b91a8">○</div>
+        <div><div class="ship-stat-val" id="st-offline">—</div><div class="ship-stat-label">Offline</div></div>
+      </div>
+      <div class="ship-stat-card">
+        <div class="ship-stat-icon" style="background:rgba(239,68,68,0.12);color:#ef4444">✕</div>
+        <div><div class="ship-stat-val" id="st-inactive">—</div><div class="ship-stat-label">Inactive</div></div>
+      </div>
+      <div class="ship-stat-card">
+        <div class="ship-stat-icon" style="background:rgba(249,115,22,0.12);color:#f97316">🆕</div>
+        <div><div class="ship-stat-val" id="st-new">—</div><div class="ship-stat-label">New This Month</div></div>
+      </div>
+      <div class="ship-stat-card">
+        <div class="ship-stat-icon" style="background:rgba(34,197,94,0.12);color:#22c55e">📦</div>
+        <div><div class="ship-stat-val" id="st-deliveries">—</div><div class="ship-stat-label">Total Delivered</div></div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filters-bar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" class="search-input"
+               placeholder="Search by name, email or zone…"
+               oninput="debounceSearch()"/>
+        <button class="search-clear" id="search-clear" onclick="clearSearch()" style="display:none">✕</button>
+      </div>
+      <div class="filter-tabs" id="status-tabs">
+        <button class="filter-tab active" data-status="">All</button>
+        <button class="filter-tab" data-status="active">Active</button>
+        <button class="filter-tab" data-status="offline">Offline</button>
+        <button class="filter-tab" data-status="inactive">Inactive</button>
+      </div>
+    </div>
+
+    <!-- AGENTS GRID -->
+    <div class="agents-grid" id="agents-grid">
+      <div class="error-state"><span>⏳</span><p>Loading…</p></div>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination" id="pagination" style="display:none">
+      <button class="page-btn" id="prev-btn" onclick="changePage(-1)">← Prev</button>
+      <div class="page-info" id="page-info"></div>
+      <button class="page-btn" id="next-btn" onclick="changePage(1)">Next →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal" onclick="closeModal('detail-modal')">
+  <div class="modal modal-lg" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="user-modal-head">
+        <div class="user-modal-avatar" id="detail-avatar">?</div>
+        <div>
+          <div class="modal-title" id="detail-name">Agent Details</div>
+          <div class="modal-sub" id="detail-sub"></div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal('detail-modal')">✕</button>
+    </div>
+    <div class="modal-body" id="detail-body">
+      <div class="error-state"><span>⏳</span><p>Loading…</p></div>
+    </div>
+    <div class="modal-footer" id="detail-footer">
+      <button class="btn-secondary" onclick="closeModal('detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE / EDIT MODAL -->
+<div class="modal-overlay" id="create-modal" onclick="closeModal('create-modal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" id="create-modal-title">Add New Agent</div>
+      <button class="modal-close" onclick="closeModal('create-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" class="form-input" id="agent-name" placeholder="e.g. Arjun Kumar"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input type="email" class="form-input" id="agent-email" placeholder="agent@nepxpress.com"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <input type="text" class="form-input" id="agent-phone" placeholder="e.g. 9801234567"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Zone</label>
+          <input type="text" class="form-input" id="agent-zone" placeholder="e.g. Kathmandu"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="agent-status">
+            <option value="active">Active</option>
+            <option value="offline">Offline</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('create-modal')">Cancel</button>
+      <button class="btn-primary" id="create-submit-btn" onclick="submitAgent()">Add Agent</button>
+    </div>
+  </div>
+</div>
+
+<!-- STATUS MODAL -->
+<div class="modal-overlay" id="status-modal" onclick="closeModal('status-modal')">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">Update Status</div>
+      <button class="modal-close" onclick="closeModal('status-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-label">Agent: <strong id="status-agent-name"></strong></p>
+      <div class="form-group">
+        <label class="form-label">New Status</label>
+        <select class="form-select" id="status-select">
+          <option value="active">Active</option>
+          <option value="offline">Offline</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('status-modal')">Cancel</button>
+      <button class="btn-primary" onclick="submitStatusUpdate()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="delete-modal" onclick="closeModal('delete-modal')">
+  <div class="modal modal-sm" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title" style="color:#ef4444">Delete Agent</div>
+      <button class="modal-close" onclick="closeModal('delete-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text2);font-size:14px;line-height:1.6">
+        Are you sure you want to delete <strong id="delete-agent-name"></strong>?
+        They will be unassigned from all shipments. This cannot be undone.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('delete-modal')">Cancel</button>
+      <button class="btn-danger" onclick="submitDelete()">Delete Agent</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';
+let currentPage   = 1;
+let currentStatus = '';
+let currentSearch = '';
+let totalPages    = 1;
+let activeAgentId = null;
+let editMode      = false;
+let debounceTimer = null;
+
+const $ = id => document.getElementById(id);
+
+function showToast(msg, type='info') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function initials(name) {
+  return (name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function formatDate(str) {
+  if (!str) return '—';
+  return new Date(str).toLocaleDateString('en-US', { day:'numeric', month:'short', year:'numeric' });
+}
+
+const AVATAR_COLORS = [
+  ['#f97316','#fb923c'],['#3b82f6','#60a5fa'],
+  ['#a855f7','#c084fc'],['#22c55e','#4ade80'],
+  ['#ef4444','#f87171'],['#eab308','#facc15'],
+];
+
+function avatarStyle(id) {
+  const c = AVATAR_COLORS[id % AVATAR_COLORS.length];
+  return `background:linear-gradient(135deg,${c[0]},${c[1]});color:white`;
+}
+
+const STATUS_CONFIG = {
+  active:   { cls:'agent-active',   label:'Active',   dot:'#22c55e' },
+  offline:  { cls:'agent-offline',  label:'Offline',  dot:'#8b91a8' },
+  inactive: { cls:'agent-inactive', label:'Inactive', dot:'#ef4444' },
+};
+
+const SHIP_STATUS = {
+  delivered:  { cls:'badge-delivered',  label:'Delivered'  },
+  in_transit: { cls:'badge-in_transit', label:'In Transit' },
+  processing: { cls:'badge-processing', label:'Processing' },
+  delayed:    { cls:'badge-delayed',    label:'Delayed'    },
+  pending:    { cls:'badge-pending',    label:'Pending'    },
+  cancelled:  { cls:'badge-cancelled',  label:'Cancelled'  },
+};
+
+async function apiFetch(path, options={}) {
+  const res = await fetch(API + path, { credentials:'same-origin', ...options });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.message || 'API error');
+  return json.data;
+}
+
+// ── INIT ──
+async function init() {
+  try {
+    const me = await apiFetch('/api/admin/me');
+    const av = initials(me.name);
+    $('sb-avatar').textContent = av;
+    $('top-avatar').textContent = av;
+    $('sb-name').textContent = me.name;
+  } catch(e) {
+    const name = "{{ user_name|default('Admin') }}";
+    $('sb-avatar').textContent = initials(name);
+    $('top-avatar').textContent = initials(name);
+    $('sb-name').textContent = name;
+  }
+  await loadStats();
+  await loadAgents();
+}
+
+// ── STATS ──
+async function loadStats() {
+  try {
+    const d = await apiFetch('/api/admin/delivery-agents/stats');
+    $('st-total').textContent     = d.total;
+    $('st-active').textContent    = d.active;
+    $('st-offline').textContent   = d.offline;
+    $('st-inactive').textContent  = d.inactive;
+    $('st-new').textContent       = d.new_this_month;
+    $('st-deliveries').textContent= d.total_deliveries;
+    $('sb-total').textContent     = d.total;
+  } catch(e) { console.error('Stats error:', e); }
+}
+
+// ── LOAD AGENTS ──
+async function loadAgents() {
+  $('agents-grid').innerHTML = `<div class="error-state"><span>⏳</span><p>Loading…</p></div>`;
+  try {
+    let url = `/api/admin/delivery-agents?page=${currentPage}&limit=12`;
+    if (currentStatus) url += `&status=${currentStatus}`;
+    if (currentSearch) url += `&search=${encodeURIComponent(currentSearch)}`;
+    const data = await apiFetch(url);
+    renderGrid(data.agents);
+    renderPagination(data.pagination);
+  } catch(e) {
+    $('agents-grid').innerHTML = `<div class="error-state"><span>⚠</span><p>${e.message}</p></div>`;
+  }
+}
+
+// ── RENDER GRID ──
+function renderGrid(list) {
+  if (!list?.length) {
+    $('agents-grid').innerHTML = `<div class="error-state"><span>🛵</span><p>No agents found</p></div>`;
+    return;
+  }
+
+  $('agents-grid').innerHTML = list.map(a => {
+    const sc = STATUS_CONFIG[a.status] || STATUS_CONFIG.offline;
+    const pct = a.total_deliveries > 0
+      ? Math.round((a.completed / a.total_deliveries) * 100)
+      : 0;
+    return `
+      <div class="agent-card">
+        <div class="agent-card-top">
+          <div class="agent-card-avatar" style="${avatarStyle(a.id)}">${initials(a.name)}</div>
+          <div class="agent-status-dot ${sc.cls}"></div>
+        </div>
+        <div class="agent-card-name">${a.name}</div>
+        <div class="agent-card-email">${a.email}</div>
+        <div class="agent-card-zone">${a.zone ? '📍 ' + a.zone : '📍 No zone'}</div>
+
+        <div class="agent-card-stats">
+          <div class="agent-stat">
+            <div class="agent-stat-val">${a.total_deliveries}</div>
+            <div class="agent-stat-label">Total</div>
+          </div>
+          <div class="agent-stat">
+            <div class="agent-stat-val" style="color:#22c55e">${a.completed}</div>
+            <div class="agent-stat-label">Done</div>
+          </div>
+          <div class="agent-stat">
+            <div class="agent-stat-val" style="color:#ef4444">${a.delayed}</div>
+            <div class="agent-stat-label">Delayed</div>
+          </div>
+        </div>
+
+        <div class="agent-perf-bar">
+          <div class="agent-perf-label">
+            <span>Success Rate</span>
+            <span>${pct}%</span>
+          </div>
+          <div class="agent-bar-track">
+            <div class="agent-bar-fill" style="width:${pct}%;background:${pct>70?'#22c55e':pct>40?'#eab308':'#ef4444'}"></div>
+          </div>
+        </div>
+
+        <div class="agent-card-footer">
+          <button class="action-btn view-btn" title="View details" onclick="openDetail(${a.id})">👁</button>
+          <button class="action-btn edit-btn" title="Edit"         onclick="openEditModal(${a.id},'${a.name}','${a.email}','${a.phone||''}','${a.zone||''}','${a.status}')">✏</button>
+          <button class="action-btn warn-btn" title="Update status" onclick="openStatusModal(${a.id},'${a.name}','${a.status}')">⟳</button>
+          <button class="action-btn del-btn"  title="Delete"        onclick="openDeleteModal(${a.id},'${a.name}')">🗑</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── PAGINATION ──
+function renderPagination(p) {
+  totalPages = p.total_pages;
+  if (p.total_pages <= 1) { $('pagination').style.display='none'; return; }
+  $('pagination').style.display = 'flex';
+  $('page-info').textContent = `Page ${p.page} of ${p.total_pages} (${p.total} agents)`;
+  $('prev-btn').disabled = p.page <= 1;
+  $('next-btn').disabled = p.page >= p.total_pages;
+}
+
+function changePage(dir) {
+  currentPage = Math.max(1, Math.min(totalPages, currentPage + dir));
+  loadAgents();
+}
+
+// ── FILTER TABS ──
+$('status-tabs').addEventListener('click', e => {
+  const tab = e.target.closest('.filter-tab');
+  if (!tab) return;
+  $('status-tabs').querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  currentStatus = tab.dataset.status;
+  currentPage = 1;
+  loadAgents();
+});
+
+// ── SEARCH ──
+function debounceSearch() {
+  clearTimeout(debounceTimer);
+  const val = $('search-input').value.trim();
+  $('search-clear').style.display = val ? 'block' : 'none';
+  debounceTimer = setTimeout(() => {
+    currentSearch = val;
+    currentPage = 1;
+    loadAgents();
+  }, 400);
+}
+
+function clearSearch() {
+  $('search-input').value = '';
+  $('search-clear').style.display = 'none';
+  currentSearch = '';
+  currentPage = 1;
+  loadAgents();
+}
+
+// ── DETAIL MODAL ──
+async function openDetail(id) {
+  activeAgentId = id;
+  $('detail-body').innerHTML = `<div class="error-state"><span>⏳</span><p>Loading…</p></div>`;
+  openModal('detail-modal');
+  try {
+    const { agent, shipments } = await apiFetch(`/api/admin/delivery-agents/${id}`);
+    const sc = STATUS_CONFIG[agent.status] || STATUS_CONFIG.offline;
+    const pct = agent.total_deliveries > 0
+      ? Math.round((agent.completed / agent.total_deliveries) * 100) : 0;
+
+    $('detail-avatar').textContent = initials(agent.name);
+    $('detail-avatar').style = avatarStyle(agent.id);
+    $('detail-name').textContent = agent.name;
+    $('detail-sub').innerHTML = `
+      <span style="color:var(--text3);font-size:12px">${agent.email}</span>
+      <span class="agent-status-badge ${sc.cls}" style="margin-left:8px">${sc.label}</span>`;
+
+    $('detail-body').innerHTML = `
+      <div class="detail-grid">
+        <div class="detail-section">
+          <div class="detail-section-title">🛵 Agent Info</div>
+          <div class="detail-row"><span>Name</span><strong>${agent.name}</strong></div>
+          <div class="detail-row"><span>Email</span><strong>${agent.email}</strong></div>
+          <div class="detail-row"><span>Phone</span><strong>${agent.phone||'—'}</strong></div>
+          <div class="detail-row"><span>Zone</span><strong>${agent.zone||'—'}</strong></div>
+          <div class="detail-row"><span>Status</span><span class="agent-status-badge ${sc.cls}">${sc.label}</span></div>
+          <div class="detail-row"><span>Joined</span><strong>${formatDate(agent.created_at)}</strong></div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-section-title">📊 Performance</div>
+          <div class="detail-row"><span>Total Assigned</span><strong>${agent.total_deliveries}</strong></div>
+          <div class="detail-row"><span>Completed</span><strong style="color:#22c55e">${agent.completed}</strong></div>
+          <div class="detail-row"><span>In Transit</span><strong style="color:#3b82f6">${agent.in_transit}</strong></div>
+          <div class="detail-row"><span>Delayed</span><strong style="color:#ef4444">${agent.delayed}</strong></div>
+          <div class="detail-row"><span>Success Rate</span><strong>${pct}%</strong></div>
+        </div>
+        ${shipments?.length ? `
+        <div class="detail-section detail-full">
+          <div class="detail-section-title">🕒 Recent Shipments</div>
+          ${shipments.map(s => {
+            const st = SHIP_STATUS[s.status] || { cls:'badge-pending', label:s.status };
+            return `<div class="detail-row">
+              <span style="font-family:'Syne',sans-serif;color:var(--accent);font-weight:600">${s.tracking_id}</span>
+              <span>${s.customer_name||'—'}</span>
+              <span>${s.destination}</span>
+              <span class="status-badge ${st.cls}">${st.label}</span>
+              <strong>NPR ${Number(s.amount).toLocaleString()}</strong>
+            </div>`;
+          }).join('')}
+        </div>` : ''}
+      </div>`;
+
+    $('detail-footer').innerHTML = `
+      <button class="btn-secondary" onclick="closeModal('detail-modal')">Close</button>
+      <button class="btn-primary" onclick="closeModal('detail-modal');openEditModal(${agent.id},'${agent.name}','${agent.email}','${agent.phone||''}','${agent.zone||''}','${agent.status}')">Edit</button>
+      <button class="btn-warn" onclick="closeModal('detail-modal');openStatusModal(${agent.id},'${agent.name}','${agent.status}')">Update Status</button>
+      <button class="btn-danger" onclick="closeModal('detail-modal');openDeleteModal(${agent.id},'${agent.name}')">Delete</button>`;
+
+  } catch(e) {
+    $('detail-body').innerHTML = `<div class="error-state"><span>⚠</span><p>${e.message}</p></div>`;
+  }
+}
+
+// ── CREATE MODAL ──
+function openCreateModal() {
+  editMode = false;
+  activeAgentId = null;
+  $('create-modal-title').textContent = 'Add New Agent';
+  $('create-submit-btn').textContent  = 'Add Agent';
+  $('agent-name').value   = '';
+  $('agent-email').value  = '';
+  $('agent-phone').value  = '';
+  $('agent-zone').value   = '';
+  $('agent-status').value = 'active';
+  openModal('create-modal');
+}
+
+function openEditModal(id, name, email, phone, zone, status) {
+  editMode = true;
+  activeAgentId = id;
+  $('create-modal-title').textContent = 'Edit Agent';
+  $('create-submit-btn').textContent  = 'Save Changes';
+  $('agent-name').value   = name;
+  $('agent-email').value  = email;
+  $('agent-phone').value  = phone;
+  $('agent-zone').value   = zone;
+  $('agent-status').value = status;
+  openModal('create-modal');
+}
+
+async function submitAgent() {
+  const name  = $('agent-name').value.trim();
+  const email = $('agent-email').value.trim();
+  if (!name || !email) {
+    showToast('Name and email are required', 'error');
+    return;
+  }
+  const payload = {
+    name, email,
+    phone:  $('agent-phone').value.trim(),
+    zone:   $('agent-zone').value.trim(),
+    status: $('agent-status').value
+  };
+  try {
+    if (editMode) {
+      await apiFetch(`/api/admin/delivery-agents/${activeAgentId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      showToast('Agent updated successfully', 'success');
+    } else {
+      await apiFetch('/api/admin/delivery-agents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      showToast('Agent added successfully', 'success');
+    }
+    closeModal('create-modal');
+    loadAgents();
+    loadStats();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// ── STATUS MODAL ──
+function openStatusModal(id, name, currentStatus) {
+  activeAgentId = id;
+  $('status-agent-name').textContent = name;
+  $('status-select').value = currentStatus;
+  openModal('status-modal');
+}
+
+async function submitStatusUpdate() {
+  try {
+    await apiFetch(`/api/admin/delivery-agents/${activeAgentId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: $('status-select').value })
+    });
+    showToast('Status updated!', 'success');
+    closeModal('status-modal');
+    loadAgents();
+    loadStats();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// ── DELETE MODAL ──
+function openDeleteModal(id, name) {
+  activeAgentId = id;
+  $('delete-agent-name').textContent = name;
+  openModal('delete-modal');
+}
+
+async function submitDelete() {
+  try {
+    await apiFetch(`/api/admin/delivery-agents/${activeAgentId}`, { method: 'DELETE' });
+    showToast('Agent deleted', 'success');
+    closeModal('delete-modal');
+    loadAgents();
+    loadStats();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// ── MODAL HELPERS ──
+function openModal(id)  { $(id).classList.add('open');    document.body.style.overflow='hidden'; }
+function closeModal(id) { $(id).classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape')
+    ['detail-modal','create-modal','status-modal','delete-modal'].forEach(closeModal);
+});
+
+async function handleLogout() {
+  await fetch('/api/admin/logout', { method:'POST', credentials:'same-origin' });
+  window.location.href = '/';
+}
+
+init();
+</script>
+</body>
+</html>

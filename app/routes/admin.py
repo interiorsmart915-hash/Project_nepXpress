@@ -3,6 +3,7 @@ from app.controllers.AdminAuthController import AdminAuthController
 from app.controllers.AdminDashboardController import AdminDashboardController
 from app.controllers.shipmentcontrollers import ShipmentController
 from app.controllers.AdminUserController import AdminUserController
+from app.controllers.AdminAgentController import AdminAgentController
 
 admin_bp = Blueprint('admin_api', __name__, url_prefix='/api/admin')
 
@@ -37,3 +38,13 @@ admin_bp.add_url_rule('/users/<int:user_id>',      'users_one',           AdminU
 admin_bp.add_url_rule('/users/<int:user_id>/status','users_status',       AdminUserController.update_status, methods=['PATCH'])
 admin_bp.add_url_rule('/users/<int:user_id>/role', 'users_role',          AdminUserController.update_role,   methods=['PATCH'])
 admin_bp.add_url_rule('/users/<int:user_id>',      'users_delete',        AdminUserController.delete,        methods=['DELETE'])
+
+
+#-- Delivery agent management ────────────────────────────────────────────────── #
+admin_bp.add_url_rule('/delivery-agents',                       'da_list',   AdminAgentController.get_all,       methods=['GET'])
+admin_bp.add_url_rule('/delivery-agents/stats',                 'da_stats',  AdminAgentController.get_stats,     methods=['GET'])
+admin_bp.add_url_rule('/delivery-agents',                       'da_create', AdminAgentController.create,        methods=['POST'])
+admin_bp.add_url_rule('/delivery-agents/<int:agent_id>',        'da_one',    AdminAgentController.get_one,       methods=['GET'])
+admin_bp.add_url_rule('/delivery-agents/<int:agent_id>',        'da_update', AdminAgentController.update,        methods=['PUT'])
+admin_bp.add_url_rule('/delivery-agents/<int:agent_id>/status', 'da_status', AdminAgentController.update_status, methods=['PATCH'])
+admin_bp.add_url_rule('/delivery-agents/<int:agent_id>',        'da_delete', AdminAgentController.delete,        methods=['DELETE'])

@@ -138,4 +138,6 @@ INSERT INTO shipments (tracking_id, customer_id, agent_id, destination, status, 
 ALTER TABLE users 
 ADD COLUMN security_answer VARCHAR(255) DEFAULT NULL;
 
+DESCRIBE delivery_agents;
 
+SELECT * FROM delivery_agents;
