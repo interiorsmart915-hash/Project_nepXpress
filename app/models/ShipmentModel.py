@@ -26,10 +26,10 @@ class Shipment(BaseModel):
             "INSERT INTO shipments "
             "(tracking_id, user_id, sender_name, sender_phone, sender_address, "
             " sender_city, sender_district, receiver_name, receiver_phone, "
-            " receiver_address, receiver_city, receiver_district, package_type, "
-            " weight, estimated_value, delivery_cost, length_cm, width_cm, height_cm, "
+            " receiver_address, receiver_city, receiver_district, destination, package_type, "
+            " weight, estimated_value, delivery_cost, "
             " delivery_type, payment_method, status, instructions) "
-            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
         )
         db.execute(query, (
             data["tracking_id"],
@@ -44,13 +44,11 @@ class Shipment(BaseModel):
             data.get("receiver_address", ""),
             data.get("receiver_city", ""),
             data.get("receiver_district", ""),
+            data.get("destination", ""),
             data.get("package_type", ""),
             data.get("weight") or None,
             data.get("estimated_value") or 0,
             data.get("delivery_cost") or 0,
-            data.get("length_cm") or None,
-            data.get("width_cm") or None,
-            data.get("height_cm") or None,
             data.get("delivery_type", "Standard"),
             data.get("payment_method", "cod"),
             data.get("status", "Pending"),
