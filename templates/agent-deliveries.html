@@ -60,7 +60,7 @@
       </a>
       <a href="/agent-routes" class="nav-item">
         <svg viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-        Active Shipments
+        Active Routes
       </a>
       <a href="{{ url_for('agent.delivery_history') }}" class="nav-item">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -267,16 +267,14 @@
   </div>
 
   <script>
-    const requests = [
-      { tracking_id:'NXP-3001', user_id:'USR-101', sender_name:'Anil Sharma', sender_phone:'9841000001', sender_address:'Baneshwor Marg 14', sender_city:'Kathmandu', sender_district:'Kathmandu', receiver_name:'Priya Basnet', receiver_phone:'9841000002', receiver_address:'Pulchowk Road 7', receiver_city:'Lalitpur', receiver_district:'Lalitpur', package_type:'Parcel', weight:'1.4 kg', estimated_value:'NPR 1,500', delivery_cost:'NPR 180', length_cm:30, width_cm:20, height_cm:15, delivery_type:'Standard', payment_method:'Cash on Delivery', status:'Pending', instructions:'Please handle with care. The receiver is available after 4 PM. Call before arriving.' },
-      { tracking_id:'NXP-3002', user_id:'USR-102', sender_name:'Sanjay Lama', sender_phone:'9841000003', sender_address:'New Road 88', sender_city:'Kathmandu', sender_district:'Kathmandu', receiver_name:'Nisha Rai', receiver_phone:'9841000004', receiver_address:'Suryabinayak Tole 3', receiver_city:'Bhaktapur', receiver_district:'Bhaktapur', package_type:'Electronics', weight:'0.8 kg', estimated_value:'NPR 12,000', delivery_cost:'NPR 250', length_cm:25, width_cm:18, height_cm:10, delivery_type:'Express', payment_method:'Online', status:'Pending', instructions:'Fragile electronic item — do not tilt or drop. Require signature on delivery.' },
-      { tracking_id:'NXP-3003', user_id:'USR-103', sender_name:'Kamala Thapa', sender_phone:'9841000005', sender_address:'Kopundol Height 22', sender_city:'Lalitpur', sender_district:'Lalitpur', receiver_name:'Roshan Gurung', receiver_phone:'9841000006', receiver_address:'Madhyapur Chok 1', receiver_city:'Bhaktapur', receiver_district:'Bhaktapur', package_type:'Fragile', weight:'2.0 kg', estimated_value:'NPR 5,000', delivery_cost:'NPR 300', length_cm:40, width_cm:35, height_cm:30, delivery_type:'Standard', payment_method:'Cash on Delivery', status:'Pending', instructions:'Glass items inside. Keep upright at all times.' },
-      { tracking_id:'NXP-3004', user_id:'USR-104', sender_name:'Dipak Adhikari', sender_phone:'9841000007', sender_address:'Durbarmarg 5', sender_city:'Kathmandu', sender_district:'Kathmandu', receiver_name:'Sunita Shrestha', receiver_phone:'9841000008', receiver_address:'Imadol Lane 9', receiver_city:'Lalitpur', receiver_district:'Lalitpur', package_type:'Documents', weight:'0.3 kg', estimated_value:'NPR 500', delivery_cost:'NPR 120', length_cm:32, width_cm:25, height_cm:2, delivery_type:'Same-Day', payment_method:'Online', status:'Pending', instructions:'Legal documents — must be delivered today before 5 PM without fail.' },
-      { tracking_id:'NXP-3005', user_id:'USR-105', sender_name:'Binod Khadka', sender_phone:'9841000009', sender_address:'Patan Dhoka 3', sender_city:'Lalitpur', sender_district:'Lalitpur', receiver_name:'Gita Pandey', receiver_phone:'9841000010', receiver_address:'Tinkune 11', receiver_city:'Kathmandu', receiver_district:'Kathmandu', package_type:'Parcel', weight:'3.2 kg', estimated_value:'NPR 2,800', delivery_cost:'NPR 350', length_cm:50, width_cm:40, height_cm:25, delivery_type:'Standard', payment_method:'Cash on Delivery', status:'Pending', instructions:null },
-      { tracking_id:'NXP-3006', user_id:'USR-106', sender_name:'Rina Maharjan', sender_phone:'9841000011', sender_address:'Jawalakhel 18', sender_city:'Lalitpur', sender_district:'Lalitpur', receiver_name:'Subash Magar', receiver_phone:'9841000012', receiver_address:'Changunarayan Road 6', receiver_city:'Bhaktapur', receiver_district:'Bhaktapur', package_type:'Electronics', weight:'1.1 kg', estimated_value:'NPR 8,500', delivery_cost:'NPR 220', length_cm:28, width_cm:22, height_cm:12, delivery_type:'Express', payment_method:'Online', status:'Pending', instructions:'Receiver works night shift — available from 7 AM to 2 PM only.' },
-      { tracking_id:'NXP-3007', user_id:'USR-107', sender_name:'Prakash Sthapit', sender_phone:'9841000013', sender_address:'Bhaktapur Durbar 2', sender_city:'Bhaktapur', sender_district:'Bhaktapur', receiver_name:'Anita Joshi', receiver_phone:'9841000014', receiver_address:'Lazimpat 44', receiver_city:'Kathmandu', receiver_district:'Kathmandu', package_type:'Parcel', weight:'0.9 kg', estimated_value:'NPR 900', delivery_cost:'NPR 160', length_cm:20, width_cm:15, height_cm:10, delivery_type:'Standard', payment_method:'Cash on Delivery', status:'Pending', instructions:null },
-      { tracking_id:'NXP-3008', user_id:'USR-108', sender_name:'Mohan Tamrakar', sender_phone:'9841000015', sender_address:'Kalanki Chowk 7', sender_city:'Kathmandu', sender_district:'Kathmandu', receiver_name:'Sabina Karmacharya', receiver_phone:'9841000016', receiver_address:'Thimi 20', receiver_city:'Bhaktapur', receiver_district:'Bhaktapur', package_type:'Fragile', weight:'1.6 kg', estimated_value:'NPR 3,200', delivery_cost:'NPR 280', length_cm:35, width_cm:28, height_cm:20, delivery_type:'Same-Day', payment_method:'Online', status:'Pending', instructions:'Ceramic pottery inside. Handle extremely gently. Do not stack anything on top of this package.' },
-    ];
+    /*
+     * requests — injected by available_deliveries() in AgentController.
+     * Fields from get_available_deliveries() (used for cards):
+     *   id, tracking_id, sender_city, destination, package_type,
+     *   weight, estimated_value, delivery_cost, status
+     * Full detail fields are fetched on-demand via /api/agent/shipment-details/<id>.
+     */
+    const requests = {{ requests | tojson | safe }};
 
     const TYPE_ICONS = {
       'Parcel':      '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
@@ -302,42 +300,43 @@
       empty.style.display = 'none';
       document.getElementById('resultCount').textContent = filtered.length + ' request' + (filtered.length !== 1 ? 's' : '') + ' available';
 
+      // get_available_deliveries returns: id, tracking_id, sender_city,
+      // destination, package_type, weight, estimated_value, delivery_cost, status
       grid.innerHTML = filtered.map(function(r, i) {
+        var weightStr = r.weight != null ? r.weight + ' kg' : '—';
+        var costStr   = r.delivery_cost != null ? 'NPR ' + parseFloat(r.delivery_cost).toLocaleString() : '—';
         return '<div class="request-card" style="animation-delay:' + (i * 0.05) + 's">' +
           '<div class="card-head">' +
             '<div class="card-icon-wrap ' + (TYPE_COLOR[r.package_type] || 'blue') + '">' + (TYPE_ICONS[r.package_type] || TYPE_ICONS['Parcel']) + '</div>' +
             '<div class="card-head-info">' +
               '<div class="card-tracking">' + r.tracking_id + '</div>' +
-              '<div class="card-user">Customer #' + r.user_id + '</div>' +
+              '<div class="card-user">Shipment #' + r.id + '</div>' +
             '</div>' +
             '<div class="card-badges">' +
-              '<span class="card-badge ' + (DELIVERY_BADGE[r.delivery_type] || 'badge-std') + '">' + r.delivery_type + '</span>' +
-              (r.payment_method === 'Cash on Delivery'
-                ? '<span class="card-badge badge-cod">COD</span>'
-                : '<span class="card-badge badge-online">Online</span>') +
+              '<span class="card-badge badge-std">' + (r.package_type || 'Package') + '</span>' +
             '</div>' +
           '</div>' +
           '<div class="card-route">' +
             '<div class="card-location">' +
               '<div class="location-dot dot-from"></div>' +
-              '<div class="location-info"><span class="location-label">Pickup</span><span class="location-val">' + r.sender_city + ', ' + r.sender_district + '</span></div>' +
+              '<div class="location-info"><span class="location-label">Pickup</span><span class="location-val">' + (r.sender_city || '—') + '</span></div>' +
             '</div>' +
             '<div class="route-line"></div>' +
             '<div class="card-location">' +
               '<div class="location-dot dot-to"></div>' +
-              '<div class="location-info"><span class="location-label">Deliver to</span><span class="location-val">' + r.receiver_city + ', ' + r.receiver_district + '</span></div>' +
+              '<div class="location-info"><span class="location-label">Deliver to</span><span class="location-val">' + (r.destination || '—') + '</span></div>' +
             '</div>' +
           '</div>' +
           '<div class="card-meta">' +
-            '<div class="meta-item"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>' + r.package_type + '</div>' +
-            '<div class="meta-item"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' + r.weight + '</div>' +
-            '<div class="meta-cost">' + r.delivery_cost + '</div>' +
+            '<div class="meta-item"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>' + (r.package_type || '—') + '</div>' +
+            '<div class="meta-item"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' + weightStr + '</div>' +
+            '<div class="meta-cost">' + costStr + '</div>' +
           '</div>' +
           '<div class="card-actions">' +
-            '<button class="btn-details" onclick="openDetail(\'' + r.tracking_id + '\')">' +
+            '<button class="btn-details" onclick="openDetail(' + r.id + ')">' +
               '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>View Details' +
             '</button>' +
-            '<button class="btn-accept-card" onclick="quickAccept(\'' + r.tracking_id + '\')">' +
+            '<button class="btn-accept-card" onclick="quickAccept(' + r.id + ', \'' + r.tracking_id + '\')">' +
               '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Accept' +
             '</button>' +
           '</div>' +
@@ -350,47 +349,65 @@
       var dt = document.getElementById('filterType').value;
       var dd = document.getElementById('filterDelivery').value;
       var dp = document.getElementById('filterPayment').value;
+      // Only filter on columns returned by get_available_deliveries():
+      // tracking_id, sender_city, destination, package_type, status
+      // delivery_type and payment_method come from the full detail fetch — skip those filters here
       filtered = requests.filter(function(r) {
-        var matchQ = !q  || r.tracking_id.toLowerCase().includes(q) || r.sender_city.toLowerCase().includes(q) || r.receiver_city.toLowerCase().includes(q) || r.sender_district.toLowerCase().includes(q) || r.receiver_district.toLowerCase().includes(q);
+        var matchQ = !q  || (r.tracking_id && r.tracking_id.toLowerCase().includes(q))
+                         || (r.sender_city  && r.sender_city.toLowerCase().includes(q))
+                         || (r.destination  && r.destination.toLowerCase().includes(q));
         var matchT = !dt || r.package_type === dt;
-        var matchD = !dd || r.delivery_type === dd;
-        var matchP = !dp || r.payment_method === dp;
-        return matchQ && matchT && matchD && matchP;
+        // delivery_type / payment_method not in list response — ignore those dropdowns on card view
+        return matchQ && matchT;
       });
       renderCards();
     }
 
-    function openDetail(id) {
-      var r = requests.find(function(x) { return x.tracking_id === id; });
-      if (!r) return;
-      currentId = id;
-      document.getElementById('m-tracking').textContent        = r.tracking_id;
-      document.getElementById('m-sender-name').textContent     = r.sender_name;
-      document.getElementById('m-sender-phone').textContent    = r.sender_phone;
-      document.getElementById('m-sender-address').textContent  = r.sender_address;
-      document.getElementById('m-sender-city').textContent     = r.sender_city;
-      document.getElementById('m-sender-district').textContent = r.sender_district;
-      document.getElementById('m-receiver-name').textContent     = r.receiver_name;
-      document.getElementById('m-receiver-phone').textContent    = r.receiver_phone;
-      document.getElementById('m-receiver-address').textContent  = r.receiver_address;
-      document.getElementById('m-receiver-city').textContent     = r.receiver_city;
-      document.getElementById('m-receiver-district').textContent = r.receiver_district;
-      document.getElementById('m-pkg-type').textContent    = r.package_type;
-      document.getElementById('m-weight').textContent      = r.weight;
-      document.getElementById('m-dims').textContent        = r.length_cm + ' x ' + r.width_cm + ' x ' + r.height_cm + ' cm';
-      document.getElementById('m-value').textContent       = r.estimated_value;
-      document.getElementById('m-delivery-type').textContent = r.delivery_type;
-      document.getElementById('m-payment').textContent     = r.payment_method;
-      document.getElementById('m-cost').textContent        = r.delivery_cost;
-      document.getElementById('m-status').textContent      = r.status;
-      var instrGroup = document.getElementById('m-instructions-group');
-      if (r.instructions) {
-        document.getElementById('m-instructions').textContent = r.instructions;
-        instrGroup.style.display = '';
-      } else {
-        instrGroup.style.display = 'none';
-      }
+    function openDetail(shipmentId) {
+      // Show modal immediately with a loading state, then populate via API
+      currentId = shipmentId;
+      document.getElementById('m-tracking').textContent = 'Loading…';
+      ['m-sender-name','m-sender-phone','m-sender-address','m-sender-city','m-sender-district',
+       'm-receiver-name','m-receiver-phone','m-receiver-address','m-receiver-city','m-receiver-district',
+       'm-pkg-type','m-weight','m-dims','m-value','m-delivery-type','m-payment','m-cost','m-status'
+      ].forEach(function(id){ document.getElementById(id).textContent = '…'; });
+      document.getElementById('m-instructions-group').style.display = 'none';
       document.getElementById('detailModal').classList.add('open');
+
+      fetch('/api/agent/shipment-details/' + shipmentId)
+        .then(function(res){ return res.json(); })
+        .then(function(json){
+          if (!json.success) { showToast(json.message || 'Could not load details.', 'danger'); return; }
+          var r = json.data;
+          document.getElementById('m-tracking').textContent          = r.tracking_id || '—';
+          document.getElementById('m-sender-name').textContent       = r.sender_name || '—';
+          document.getElementById('m-sender-phone').textContent      = r.sender_phone || '—';
+          document.getElementById('m-sender-address').textContent    = r.sender_address || '—';
+          document.getElementById('m-sender-city').textContent       = r.sender_city || '—';
+          document.getElementById('m-sender-district').textContent   = r.sender_district || '—';
+          document.getElementById('m-receiver-name').textContent     = r.receiver_name || '—';
+          document.getElementById('m-receiver-phone').textContent    = r.receiver_phone || '—';
+          document.getElementById('m-receiver-address').textContent  = r.receiver_address || '—';
+          document.getElementById('m-receiver-city').textContent     = r.receiver_city || '—';
+          document.getElementById('m-receiver-district').textContent = r.receiver_district || '—';
+          document.getElementById('m-pkg-type').textContent          = r.package_type || '—';
+          document.getElementById('m-weight').textContent            = r.weight != null ? r.weight + ' kg' : '—';
+          var dims = (r.length_cm || '?') + ' x ' + (r.width_cm || '?') + ' x ' + (r.height_cm || '?') + ' cm';
+          document.getElementById('m-dims').textContent              = dims;
+          document.getElementById('m-value').textContent             = r.estimated_value != null ? 'NPR ' + parseFloat(r.estimated_value).toLocaleString() : '—';
+          document.getElementById('m-delivery-type').textContent     = r.delivery_type || '—';
+          document.getElementById('m-payment').textContent           = r.payment_method || '—';
+          document.getElementById('m-cost').textContent              = r.delivery_cost != null ? 'NPR ' + parseFloat(r.delivery_cost).toLocaleString() : '—';
+          document.getElementById('m-status').textContent            = r.status || '—';
+          var instrGroup = document.getElementById('m-instructions-group');
+          if (r.instructions) {
+            document.getElementById('m-instructions').textContent = r.instructions;
+            instrGroup.style.display = '';
+          } else {
+            instrGroup.style.display = 'none';
+          }
+        })
+        .catch(function(){ showToast('Network error — could not load shipment details.', 'danger'); });
     }
 
     function closeModal(e) {
@@ -398,14 +415,33 @@
     }
 
     function acceptDelivery() {
-      var id = currentId;
+      var shipmentId = currentId;
       document.getElementById('detailModal').classList.remove('open');
-      requests.splice(requests.findIndex(function(r){ return r.tracking_id === id; }), 1);
-      applyFilters();
-      showToast('Request ' + id + ' accepted — added to your active routes.', 'success');
+
+      fetch('/api/agent/accept-delivery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shipment_id: shipmentId })
+      })
+      .then(function(res){ return res.json(); })
+      .then(function(json){
+        if (json.success) {
+          // Remove from local list so it disappears without a page reload
+          var idx = requests.findIndex(function(r){ return r.id === shipmentId; });
+          if (idx !== -1) requests.splice(idx, 1);
+          applyFilters();
+          showToast(json.message || 'Delivery accepted — added to your active routes.', 'success');
+        } else {
+          showToast(json.message || 'Could not accept this delivery.', 'danger');
+        }
+      })
+      .catch(function(){ showToast('Network error — please try again.', 'danger'); });
     }
 
-    function quickAccept(id) { currentId = id; acceptDelivery(); }
+    function quickAccept(shipmentId, trackingId) {
+      currentId = shipmentId;
+      acceptDelivery();
+    }
 
     function passDelivery() {
       document.getElementById('detailModal').classList.remove('open');
@@ -422,10 +458,14 @@
       var sel = document.getElementById('agentSelect');
       if (!sel.value) { showToast('Please select an agent first.', 'danger'); return; }
       var agentName = sel.options[sel.selectedIndex].text;
+      var note      = document.getElementById('passNote').value;
       document.getElementById('passModal').classList.remove('open');
-      requests.splice(requests.findIndex(function(r){ return r.tracking_id === currentId; }), 1);
+      // TODO: wire to a backend route when pass-to-agent endpoint is added.
+      // For now, remove from the local list and show a toast.
+      var idx = requests.findIndex(function(r){ return r.id === currentId; });
+      if (idx !== -1) requests.splice(idx, 1);
       applyFilters();
-      showToast('Request ' + currentId + ' passed to ' + agentName + '.', 'success');
+      showToast('Request passed to ' + agentName + '.', 'success');
     }
 
     function toggleDuty(cb) {
