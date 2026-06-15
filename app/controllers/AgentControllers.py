@@ -72,3 +72,73 @@ class AgentController(BaseController):
             return jsonify({"success": False, "message": "Delivery assignment failed. It may have been taken by another agent."}), 400
             
         return jsonify({"success": True, "message": "Delivery successfully assigned to your route!"})
+    
+    def shipment_management(self):
+        """GET /agent-routes — renders active routes page"""
+        if "user_id" not in session or session.get("user_role") != "agent":
+            return redirect(url_for("auth.login"))
+
+        agent_id = session.get("user_id")
+        deliveries = Shipment.get_active_for_agent(agent_id)
+
+        return render_template(
+            "agent-routes.html",
+            deliveries=deliveries,
+            user_name=session.get("user_name"),
+            user_role=session.get("user_role")
+        )
+
+    def update_status(self):
+        """POST /api/agent/update-status"""
+        if "user_id" not in session or session.get("user_role") != "agent":
+            return jsonify({"success": False, "message": "Unauthorized"}), 401
+
+        data        = request.get_json() or {}
+        shipment_id = data.get("shipment_id")
+        new_status  = data.get("status")
+
+        VALID_STATUSES = ["Picked Up", "In Transit", "Out for Delivery", "Delivered"]
+
+        if not shipment_id or not new_status:
+            return jsonify({"success": False, "message": "Missing shipment_id or status"}), 400
+        if new_status not in VALID_STATUSES:
+            return jsonify({"success": False, "message": "Invalid status value"}), 400
+
+        agent_id = session.get("user_id")
+        affected = Shipment.update_status(shipment_id, agent_id, new_status)
+        if not affected:
+            return jsonify({"success": False, "message": "Update failed — not your shipment or already closed"}), 400
+
+        return jsonify({"success": True, "message": f"Status updated to {new_status}"})
+
+    def fail_delivery(self):
+        """POST /api/agent/fail-delivery"""
+        if "user_id" not in session or session.get("user_role") != "agent":
+            return jsonify({"success": False, "message": "Unauthorized"}), 401
+
+        data        = request.get_json() or {}
+        shipment_id = data.get("shipment_id")
+        reason      = data.get("reason")
+        agent_id    = session.get("user_id")
+
+        if not shipment_id or not reason:
+            return jsonify({"success": False, "message": "Missing shipment_id or reason"}), 400
+
+        new_attempts = Shipment.record_failed_attempt(shipment_id, agent_id)
+
+        if new_attempts >= 3:
+            Shipment.update_status(shipment_id, agent_id, "return_to_sender")
+            return jsonify({
+                "success": True,
+                "attempts": new_attempts,
+                "final": True,
+                "message": "3 attempts reached — shipment marked for return to sender."
+            })
+
+        Shipment.update_status(shipment_id, agent_id, "Failed Attempt")
+        return jsonify({
+            "success": True,
+            "attempts": new_attempts,
+            "final": False,
+            "message": f"Failed attempt {new_attempts} of 3 recorded."
+        })

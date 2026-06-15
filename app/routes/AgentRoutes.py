@@ -47,4 +47,13 @@ class AgentRoutes:
             methods=["POST"]
         )
 
+        # 6. New: Shipment Management View (for interactive route tracking)
+        self.bp.add_url_rule(
+            "/agent-routes",
+            endpoint="shipment_management",
+            view_func=self.controller.shipment_management,
+            methods=["GET"]
+        )
+
         return self.bp
+     
