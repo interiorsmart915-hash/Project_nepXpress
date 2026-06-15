@@ -26,11 +26,22 @@ class Authroutes:
             view_func=self.controller.logout,
             methods=["GET", "POST"]
         )
-        
         self.bp.add_url_rule(
-            "/base",
-            endpoint="base",
-            view_func=self.controller.base,
+            "/about-us",
+            endpoint="about_us",
+            view_func=self.controller.about_us,
             methods=["GET", "POST"]
+        )
+        self.bp.add_url_rule(
+            "/privacy-policy",
+            endpoint="privacy_policy",
+            view_func=self.controller.privacy_policy,
+            methods=["GET"]
+        )
+        self.bp.add_url_rule(
+            "/terms",
+            endpoint="terms",
+            view_func=self.controller.terms,
+            methods=["GET"]
         )
         return self.bp

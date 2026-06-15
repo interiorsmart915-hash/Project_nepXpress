@@ -166,7 +166,7 @@ class Shipment(BaseModel):
     def find_recent_for_user(self, user_id, limit=5):
         db = Database()
         results = db.fetch_all(
-            "SELECT * FROM shipments WHERE user_id=%s ORDER BY created_at DESC LIMIT %s",
+            "SELECT * FROM shipments WHERE customer_id=%s ORDER BY created_at DESC LIMIT %s",
             (user_id, limit)
         )
         db.close()
