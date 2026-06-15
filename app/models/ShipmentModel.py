@@ -26,10 +26,10 @@ class Shipment(BaseModel):
             "INSERT INTO shipments "
             "(tracking_id, user_id, sender_name, sender_phone, sender_address, "
             " sender_city, sender_district, receiver_name, receiver_phone, "
-            " receiver_address, receiver_city, receiver_district, destination, package_type, "
-            " weight, estimated_value, delivery_cost, "
-            " delivery_type, payment_method, status, instructions) "
-            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            " receiver_address, receiver_city, receiver_district, package_type, "
+            " weight, estimated_value, delivery_cost, length_cm, width_cm, height_cm, "
+            " delivery_type, payment_method, status, instructions, destination) "  # ← added
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"  # ← 24
         )
         db.execute(query, (
             data["tracking_id"],
@@ -53,6 +53,8 @@ class Shipment(BaseModel):
             data.get("payment_method", "cod"),
             data.get("status", "Pending"),
             data.get("instructions", ""),
+            # destination = "receiver_city, receiver_district" for the agent delivery list
+            f"{data.get('receiver_city', '')} {data.get('receiver_district', '')}".strip(),  # ← added
         ))
         db.close()
     # ---- READ: history page ----
@@ -176,3 +178,30 @@ class Shipment(BaseModel):
         )
         db.close()
         return results
+
+    @classmethod
+    def get_available_deliveries(cls):
+        """Fetch all shipments that have not been assigned to any driver yet."""
+        sql = """
+            SELECT id, tracking_id, sender_city, destination, package_type, 
+                   weight, estimated_value, delivery_cost, status 
+            FROM shipments 
+            WHERE agent_id IS NULL AND status = 'pending'
+            ORDER BY created_at DESC
+        """
+        return execute_query(sql, fetchall=True)
+
+    @classmethod
+    def assign_agent_to_shipment(cls, shipment_id, agent_id):
+        """Assign driver ID and update status tracking."""
+        sql = """
+            UPDATE shipments 
+            SET agent_id = %s, status = 'processing', updated_at = NOW() 
+            WHERE id = %s AND agent_id IS NULL
+        """
+        db = Database()
+        cursor = db.connection.cursor()
+        affected_rows = cursor.execute(sql, (agent_id, shipment_id))
+        db.connection.commit()
+        db.close()
+        return affected_rows
