@@ -64,7 +64,9 @@ def create_app():
 
     @app.route("/")
     def home():
-        return redirect(url_for("auth.about_us"))
+        if "user_id" in session:
+            return redirect(url_for("dashboard"))
+        return redirect(url_for("auth.login"))
         
 
     # ── PROTECTED ───────────────────────────────────────────
