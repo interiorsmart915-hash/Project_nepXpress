@@ -67,6 +67,7 @@ def create_app():
         if "user_id" in session:
             return redirect(url_for("dashboard"))
         return redirect(url_for("auth.login"))
+        
 
     # ── PROTECTED ───────────────────────────────────────────
     

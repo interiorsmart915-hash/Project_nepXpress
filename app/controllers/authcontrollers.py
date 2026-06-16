@@ -88,7 +88,17 @@ class AuthController(BaseController):
     def settings(self):
         if "user_id" not in session:
             return redirect(url_for("auth.login"))
-        return render_template('settings.html')
+        return render_template("settings.html")
 
     def base(self):
-        return render_template('base.html')
+        return render_template("base.html")
+
+    def about_us(self):
+        return render_template("about-us.html")
+    
+    def privacy_policy(self):
+        return render_template("privacy-policy.html")
+
+    def terms(self):
+        return render_template("terms.html")
+    
