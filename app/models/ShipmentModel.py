@@ -45,16 +45,14 @@ class Shipment(BaseModel):
             data.get("receiver_address", ""),
             data.get("receiver_city", ""),
             data.get("receiver_district", ""),
+            data.get("destination", ""),
             data.get("package_type", ""),
             data.get("weight") or None,
             data.get("estimated_value") or 0,
             data.get("delivery_cost") or 0,
-            data.get("length_cm") or None,
-            data.get("width_cm") or None,
-            data.get("height_cm") or None,
             data.get("delivery_type", "Standard"),
             data.get("payment_method", "cod"),
-            data.get("status", "Pending"),
+            data.get("status", "processing"),
             data.get("instructions", ""),
         ))
         db.close()
