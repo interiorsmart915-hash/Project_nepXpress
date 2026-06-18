@@ -1,0 +1,112 @@
+/* ============================================================
+   app.css — shared shell for logged-in pages
+   (dashboard, create-shipment, shipment-history, settings).
+   Sidebar (.sidebar) is removable: delete it from the HTML and
+   the main area fills the page on its own.
+   ============================================================ */
+
+:root {
+  --dark: #0d0f14; --border: #e2e5eb; --bg: #f4f5f7; --text: #1a1f2e; --muted: #8a93a8;
+  --accent: #e8a020; --blue: #3b82f6; --green: #22c55e; --orange: #f97316;
+  --radius: 16px; --shadow: 0 18px 42px rgba(15,23,42,0.12);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-family: 'DM Sans', sans-serif; font-size: 16px; scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+button, input, select, textarea { font: inherit; }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+/* shell — flex lives here, not on body, so the sidebar can be removed */
+.shell { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── SIDEBAR (removable) ── */
+.sidebar { width: 250px; min-width: 250px; background: var(--dark); display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; }
+
+/* brand (static, no hover) */
+.sidebar .brand {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin: 14px 12px 4px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+  border: 1px solid rgba(255,255,255,0.24); border-radius: 14px; box-shadow: 0 28px 70px rgba(0,0,0,0.18);
+  backdrop-filter: blur(18px); cursor: default;
+}
+.sidebar .brand-icon { width: 56px; height: 56px; background: #fff; border-radius: 12px; display: grid; place-items: center; box-shadow: 0 24px 70px rgba(0,0,0,0.2); border: 1px solid rgba(0,0,0,0.08); flex-shrink: 0; overflow: hidden; padding: 6px; }
+.sidebar .brand-logo { width: 100%; height: 100%; object-fit: contain; }
+.sidebar .brand-text { display: flex; flex-direction: column; gap: 2px; }
+.sidebar .brand-name { font-size: 18px; font-weight: 900; color: #fff; letter-spacing: -0.5px; text-shadow: 0 4px 22px rgba(0,0,0,0.32); }
+.sidebar .brand-sub { font-size: 10px; color: rgba(255,255,255,0.8); letter-spacing: 0.3px; text-shadow: 0 1px 6px rgba(0,0,0,0.22); }
+
+/* nav (flex:1 pushes contact + user to the bottom) */
+.nav { padding: 14px 12px; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; font-size: 15px;
+  font-weight: 600; color: rgba(255,255,255,0.65); transition: background 0.2s, color 0.2s;
+}
+.nav-item svg { width: 18px; height: 18px; stroke: currentColor; }
+.nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.nav-item.active { background: rgba(255,255,255,0.12); color: #fff; }
+
+/* contact block */
+.contact { margin: 0 12px 8px; padding: 14px 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; }
+.contact-title { font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+.contact-text { font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.9; word-break: break-word; }
+
+/* user block */
+.user { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; gap: 12px; }
+.user-avatar { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); display: grid; place-items: center; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.75); flex-shrink: 0; }
+.user-info { display: flex; flex-direction: column; line-height: 1.3; flex: 1; min-width: 0; }
+.user-name { font-size: 13.5px; font-weight: 600; color: #fff; }
+.user-role { font-size: 11.5px; color: rgba(255,255,255,0.4); }
+
+/* ── MAIN (fills page if sidebar removed) ── */
+.main { flex: 1 1 auto; width: 100%; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; min-width: 0; }
+
+/* topbar */
+.topbar {
+  background: #fff; border-bottom: 1px solid var(--border); padding: 20px 32px; display: flex; align-items: center;
+  justify-content: space-between; position: sticky; top: 0; z-index: 10; box-shadow: 0 8px 28px rgba(15,23,42,0.06);
+}
+.topbar-title h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.4px; }
+.topbar-title p { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.notif-btn { width: 36px; height: 36px; background: none; border: none; cursor: pointer; position: relative; display: grid; place-items: center; color: var(--muted); transition: color 0.2s; }
+.notif-btn:hover { color: var(--text); }
+.notif-btn svg { width: 20px; height: 20px; }
+.notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; border: 2px solid #fff; }
+
+/* back button (topbar, all logged-in pages except dashboard) */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 8px; background: #fff; color: var(--text);
+  border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-size: 14px;
+  font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.back-btn:hover { background: #f4f5f7; border-color: #b3bac8; transform: translateY(-1px); }
+.back-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; }
+
+/* content + shared page header */
+.content { padding: 24px 36px; width: 100%; }
+.page-header { margin-bottom: 24px; }
+.page-title { font-size: 24px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; }
+.page-sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+/* alerts */
+.alert {
+  position: fixed; top: 40px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 8px;
+  font-size: 13px; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  animation: alertFade 3s ease-out forwards; max-width: 500px; z-index: 1000; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+.alert.alert-danger { background: #fee; color: #c33; border: 1px solid #c33; }
+.alert.alert-success { background: #efe; color: #3c3; border: 1px solid #3c3; }
+.alert button { background: none; border: none; cursor: pointer; font-size: 16px; color: inherit; line-height: 1; }
+@keyframes alertFade {
+  0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-20px); pointer-events: none; }
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  .shell { flex-direction: column; height: auto; overflow: visible; }
+  .sidebar { width: 100%; min-width: 0; height: auto; position: relative; }
+  .main { height: auto; }
+}

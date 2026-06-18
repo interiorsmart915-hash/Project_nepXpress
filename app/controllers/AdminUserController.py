@@ -80,14 +80,14 @@ class AdminUserController(BaseController):
                     SUM(CASE WHEN status='in_transit' THEN 1 ELSE 0 END) as in_transit,
                     SUM(CASE WHEN status='delayed'    THEN 1 ELSE 0 END) as delayed,
                     COALESCE(SUM(amount), 0) as total_spent
-                FROM shipments WHERE customer_id = %s""",
+                FROM shipments WHERE user_id = %s""",
                 (user_id,), fetchone=True
             )
 
             # Get recent shipments
             shipments = execute_query(
                 """SELECT tracking_id, destination, status, amount, created_at
-                   FROM shipments WHERE customer_id = %s
+                   FROM shipments WHERE user_id = %s
                    ORDER BY created_at DESC LIMIT 5""",
                 (user_id,), fetchall=True
             )
@@ -134,8 +134,8 @@ class AdminUserController(BaseController):
         try:
             data = request.get_json(silent=True) or {}
             role = (data.get('role') or '').strip()
-            if role not in ('customer', 'admin'):
-                return AdminUserController.error("Role must be 'customer' or 'admin'", 400)
+            if role not in ('customer', 'admin', 'agent'):
+                return AdminUserController.error("Role must be 'customer', 'admin', or 'agent'", 400)
 
             from flask import session
             if session.get('user_id') == user_id or session.get('admin_id') == user_id:

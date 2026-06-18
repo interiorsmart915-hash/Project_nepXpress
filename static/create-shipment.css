@@ -1,358 +1,103 @@
-/* ============================================================
+/* ==========================================================
    CREATE SHIPMENT — page-specific styles only.
    Shared shell (sidebar, topbar, main-wrapper, content,
    help-btn, svg reset, body) lives in common.css.
-   ============================================================ */
+   ========================================================== */
 
-.page-header {
-  margin-bottom: 32px;
-}
-
-.page-title {
-  font-size: 34px;
-  font-weight: 800;
-  color: #0c131f;
-}
-
-.page-sub {
-  font-size: 17px;
-  color: #5e6f8d;
-  margin-top: 10px;
-  line-height: 1.6;
-}
+.page-header { margin-bottom: 32px; }
+.page-title { font-size: 34px; font-weight: 800; color: #0c131f; }
+.page-sub { font-size: 17px; color: #5e6f8d; margin-top: 10px; line-height: 1.6; }
 
 /* ── FORM GRID: 2-column layout ── */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 /* ── CARD: white box wrapping each section ── */
 .card {
-  background: #fff;
-  border-radius: 18px;
-  padding: 30px;
-  border: 1px solid #e6eaef;
-  box-shadow: 0 20px 36px rgba(15, 23, 42, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #fff; border-radius: 18px; padding: 30px; border: 1px solid #e6eaef;
+  box-shadow: 0 20px 36px rgba(15,23,42,0.06); transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+.card:hover { transform: translateY(-3px); box-shadow: 0 26px 46px rgba(15,23,42,0.1); }
+.card.full-width { grid-column: 1 / -1; }
+.card-title { font-size: 16px; font-weight: 800; color: #0d0d0d; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid #eef2f7; letter-spacing: -0.2px; }
 
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 26px 46px rgba(15, 23, 42, 0.1);
-}
+/* ── SENDER & RECEIVER CARDS: tinted backgrounds ── */
+.card:has(#senderName) { background: #f5f8ff; border-color: #dce6f5; }
+.card:has(#receiverName) { background: #f4fbf6; border-color: #c9e8d4; }
+.card:has(#senderName) .card-title, .card:has(#receiverName) .card-title { font-size: 17px; color: #111827; }
+.card:has(#senderName) .form-group label, .card:has(#receiverName) .form-group label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #5a6a80; }
+.card:has(#senderName) .form-group input, .card:has(#senderName) .form-group select,
+.card:has(#receiverName) .form-group input, .card:has(#receiverName) .form-group select { background: #fff; border-color: #c8d5e8; }
 
-/* full-width card spans both grid columns */
-.card.full-width {
-  grid-column: 1 / -1;
-}
-
-.card-title {
-  font-size: 16px;
-  font-weight: 800;
-  color: #0d0d0d;
-  margin-bottom: 20px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid #eef2f7;
-  letter-spacing: -0.2px;
-}
-
-/* ── SENDER & RECEIVER CARDS: tinted background to distinguish them ── */
-/* Sender card gets a very light blue tint */
-.card:has(#senderName) {
-  background: #f5f8ff;
-  border-color: #dce6f5;
-}
-
-/* Receiver card gets a very light green tint */
-.card:has(#receiverName) {
-  background: #f4fbf6;
-  border-color: #c9e8d4;
-}
-
-/* Slightly bolder title for these two info cards */
-.card:has(#senderName) .card-title,
-.card:has(#receiverName) .card-title {
-  font-size: 17px;
-  color: #111827;
-}
-
-/* Labels inside sender/receiver use uppercase small caps style */
-.card:has(#senderName) .form-group label,
-.card:has(#receiverName) .form-group label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #5a6a80;
-}
-
-/* Inputs inside sender/receiver: white background so they pop on tinted card */
-.card:has(#senderName) .form-group input,
-.card:has(#senderName) .form-group select,
-.card:has(#receiverName) .form-group input,
-.card:has(#receiverName) .form-group select {
-  background: #fff;
-  border-color: #c8d5e8;
-}
-
-/* ── PACKAGE DETAILS CARD ── */
-/* Very light warm tint to separate it visually from sender/receiver */
-.card.full-width:has(.three-col) {
-  background: #fdfaf5;
-  border-color: #ede8da;
-}
-
-/* Labels inside package details: same small-caps style */
-.card.full-width:has(.three-col) .form-group label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #6b5e45;
-}
-
-/* Inputs inside package details: white so they stand out */
-.card.full-width:has(.three-col) .form-group input,
-.card.full-width:has(.three-col) .form-group select,
-.card.full-width:has(.three-col) .form-group textarea {
-  background: #fff;
-  border-color: #ddd4c0;
-}
+/* ── PACKAGE DETAILS CARD: warm tint ── */
+.card.full-width:has(.three-col) { background: #fdfaf5; border-color: #ede8da; }
+.card.full-width:has(.three-col) .form-group label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #6b5e45; }
+.card.full-width:has(.three-col) .form-group input, .card.full-width:has(.three-col) .form-group select, .card.full-width:has(.three-col) .form-group textarea { background: #fff; border-color: #ddd4c0; }
 
 /* ── FORM ELEMENTS (shared defaults) ── */
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #17212f;
-  margin-bottom: 8px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 13px 16px;
-  border: 1px solid #d7dfe8;
-  border-radius: 12px;
-  font-size: 15px;
-  color: #161f2b;
-  background: #fafbfd;
-  outline: none;
-  font-family: inherit;
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 14px; font-weight: 600; color: #17212f; margin-bottom: 8px; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; padding: 13px 16px; border: 1px solid #d7dfe8; border-radius: 12px; font-size: 15px;
+  color: #161f2b; background: #fafbfd; outline: none; font-family: inherit;
   transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
+.form-group input:hover, .form-group select:hover, .form-group textarea:hover { border-color: #b3bac8; background: #fff; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #0d0d0d; box-shadow: 0 0 0 4px rgba(13,13,20,0.06); background: #fff; }
+.form-group textarea { height: 90px; resize: vertical; }
 
-.form-group input:hover,
-.form-group select:hover,
-.form-group textarea:hover {
-  border-color: #b3bac8;
-  background: #fff;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  border-color: #0d0d0d;
-  box-shadow: 0 0 0 4px rgba(13,13,20,0.06);
-  background: #fff;
-}
-
-.form-group textarea {
-  height: 90px;
-  resize: vertical;
-}
-
-/* ── FORM ROWS: side-by-side fields ── */
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-/* Three equal columns (used in package details) */
-.form-row.three-col {
-  grid-template-columns: 1fr 1fr 1fr;
-}
+/* ── FORM ROWS ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row.three-col { grid-template-columns: 1fr 1fr 1fr; }
 
 /* ── DELIVERY OPTION CARDS ── */
-.delivery-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
+.delivery-options { display: flex; flex-direction: column; gap: 10px; }
 .option-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 18px 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, transform 0.15s, box-shadow 0.15s;
+  display: flex; align-items: center; gap: 16px; padding: 18px 20px; border: 1px solid #e0e0e0;
+  border-radius: 14px; cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.15s, box-shadow 0.15s;
 }
-
-.option-card input[type="radio"] {
-  accent-color: #0d0d0d;
-  width: 18px;
-  height: 18px;
-}
-
-/* Highlight the delivery card whose radio is checked (no JS needed) */
-.option-card:has(input[type="radio"]:checked) {
-  border-color: #0d0d0d;
-  background: #fafafa;
-}
-
-.option-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 16px 30px rgba(16,24,40,0.08);
-}
-
-.option-info {
-  flex: 1;
-}
-
-.option-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1a1a1a;
-}
-
-.option-desc {
-  font-size: 12px;
-  color: #888;
-  margin-top: 2px;
-}
-
-.option-price {
-  font-size: 14px;
-  font-weight: 700;
-  color: #0d0d0d;
-}
+.option-card input[type="radio"] { accent-color: #0d0d0d; width: 18px; height: 18px; }
+.option-card:has(input[type="radio"]:checked) { border-color: #0d0d0d; background: #fafafa; }
+.option-card:hover { transform: translateY(-1px); box-shadow: 0 16px 30px rgba(16,24,40,0.08); }
+.option-info { flex: 1; }
+.option-name { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+.option-desc { font-size: 12px; color: #888; margin-top: 2px; }
+.option-price { font-size: 14px; font-weight: 700; color: #0d0d0d; }
 
 /* ── PAYMENT METHOD CARDS ── */
-.payment-options {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
+.payment-options { display: flex; gap: 12px; flex-wrap: wrap; }
 .payment-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 22px;
-  border: 1px solid #e0e0e0;
-  border-radius: 14px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 500;
-  color: #444;
+  display: flex; align-items: center; gap: 10px; padding: 14px 22px; border: 1px solid #e0e0e0;
+  border-radius: 14px; cursor: pointer; font-size: 15px; font-weight: 500; color: #444;
   transition: border-color 0.15s, background 0.15s, transform 0.15s, box-shadow 0.15s;
 }
+.payment-card input[type="radio"] { display: none; }
+.payment-card:has(input[type="radio"]:checked) { border-color: #0d0d0d; background: #fafafa; color: #0d0d0d; font-weight: 600; }
+.payment-card:hover { transform: translateY(-1px); box-shadow: 0 16px 30px rgba(16,24,40,0.08); }
+.payment-card:has(input[type="radio"]:disabled) { opacity: 0.5; cursor: not-allowed; }
+.pay-icon { font-size: 18px; }
 
-/* Radio is hidden; the whole card acts as the selector */
-.payment-card input[type="radio"] {
-  display: none;
-}
-
-/* Highlight the payment card whose radio is checked (no JS needed) */
-.payment-card:has(input[type="radio"]:checked) {
-  border-color: #0d0d0d;
-  background: #fafafa;
-  color: #0d0d0d;
-  font-weight: 600;
-}
-
-.payment-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 16px 30px rgba(16,24,40,0.08);
-}
-
-/* Disabled (coming soon) payment methods look muted and unclickable */
-.payment-card:has(input[type="radio"]:disabled) {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pay-icon {
-  font-size: 18px;
-}
-
-/* ── SUMMARY BAR: price + submit buttons ── */
+/* ── SUMMARY BAR ── */
 .summary-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 18px;
-  padding: 24px 28px;
-  margin-top: 20px;
-  background: #fff;
-  border: 1px solid #e2e5eb;
-  border-radius: 18px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px;
+  padding: 24px 28px; margin-top: 20px; background: #fff; border: 1px solid #e2e5eb; border-radius: 18px;
 }
-
-.summary-label {
-  font-size: 13px;
-  color: #62718b;
-}
-
-.summary-amount {
-  font-size: 24px;
-  font-weight: 800;
-  color: #0d0d0d;
-}
-
-.summary-actions {
-  display: flex;
-  gap: 14px;
-}
+.summary-label { font-size: 13px; color: #62718b; }
+.summary-amount { font-size: 24px; font-weight: 800; color: #0d0d0d; }
+.summary-actions { display: flex; gap: 14px; }
 
 /* ── BUTTONS ── */
 .btn-primary {
-  background: #0d0f14;
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 14px 22px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.2s, transform 0.15s;
+  background: #0d0f14; color: #fff; border: none; border-radius: 12px; padding: 14px 22px;
+  font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.2s, transform 0.15s;
 }
-
-.btn-primary:hover {
-  background: #181d25;
-  transform: translateY(-1px);
-}
-
+.btn-primary:hover { background: #181d25; transform: translateY(-1px); }
 .btn-outline {
-  background: transparent;
-  color: #0d0d0d;
-  border: 1px solid #d7dfe8;
-  border-radius: 12px;
-  padding: 14px 22px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+  background: transparent; color: #0d0d0d; border: 1px solid #d7dfe8; border-radius: 12px; padding: 14px 22px;
+  font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.2s, transform 0.15s, border-color 0.2s;
 }
+.btn-outline:hover { background: #f4f5f7; border-color: #b3bac8; transform: translateY(-1px); }
 
-.btn-outline:hover {
-  background: #f4f5f7;
-  border-color: #b3bac8;
-  transform: translateY(-1px);
-}
-
+/* ── RESPONSIVE ── */
 @media (max-width: 900px) {
   .form-grid { grid-template-columns: 1fr; }
   .payment-options { flex-direction: column; }

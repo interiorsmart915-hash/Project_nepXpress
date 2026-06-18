@@ -179,16 +179,14 @@
     <h1 class="logout-heading">Logout?</h1>
     <p class="logout-text">Are you sure you want to logout?</p>
 
-    <form method="POST" action="{{ url_for('logout') }}">
+    <form method="POST" action="{{ url_for('user.logout') }}">
       <div class="button-group">
-        <a href="{{ url_for('dashboard') }}" class="btn-cancel">No</a>
+        <a href="{{ url_for('user.dashboard') }}" class="btn-cancel">No</a>
         <button type="submit" class="btn-logout">Yes</button>
       </div>
     </form>
 
   </div>
-
-  <button class="help-btn" style="position:fixed;bottom:24px;right:24px;width:36px;height:36px;border-radius:50%;background:#e2e5eb;border:none;cursor:pointer;font-size:15px;font-weight:700;color:#8a93a8;">?</button>
 
 </body>
 </html>

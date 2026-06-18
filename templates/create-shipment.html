@@ -8,41 +8,45 @@
 {% endblock %}
 
 {% block body %}
-  <div class="main-wrapper">
-    <header class="topbar">
+  <div class="main">
+<header class="topbar">
       <div class="topbar-title">
         <h1>Create Delivery</h1>
         <p>Fill in the details to send a new package</p>
       </div>
-      <button class="notif-btn">
-        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="notif-dot"></span>
-      </button>
+      <a href="/dashboard" class="back-btn">
+        ← Back
+      </a>
     </header>
 
     <main class="content">
-      <form method="POST" action="{{ url_for('create_shipment') }}">
+      <form method="POST" action="{{ url_for('user.create_shipment') }}">
       <div class="form-grid">
 
-        <!-- CARD 1: Sender -->
+<!-- CARD 1: Sender -->
         <section class="card">
           <h2 class="card-title">Sender Information</h2>
           <div class="form-group">
             <label>Full Name</label>
-            <input type="text" id="senderName" name="sender_name" placeholder="Enter sender's full name" required />
+            <input type="text" id="senderName" name="sender_name" placeholder="Enter sender's full name" value="{{ current_user.name if current_user else '' }}" required />
           </div>
           <div class="form-group">
             <label>Phone Number</label>
-            <input type="tel" name="sender_phone" placeholder="+977 98XXXXXXXX" />
+            <input type="tel" name="sender_phone" placeholder="+977 98XXXXXXXX" value="{{ current_user.phone if current_user and current_user.phone else '' }}" />
           </div>
           <div class="form-group">
             <label>Pickup Address</label>
-            <input type="text" name="sender_address" placeholder="Street address, area" />
+            <input type="text" name="sender_address" placeholder="Street address, area" value="{{ current_user.address if current_user and current_user.address else '' }}" />
           </div>
           <div class="form-row">
             <div class="form-group">
               <label>City</label>
-              <input type="text" name="sender_city" placeholder="Enter city" />
+              <select name="sender_city" required>
+                <option value="">Select city</option>
+                {% for city in cities %}
+                  <option value="{{ city }}">{{ city }}</option>
+                {% endfor %}
+              </select>
             </div>
             <div class="form-group">
               <label>District</label>
@@ -69,7 +73,12 @@
           <div class="form-row">
             <div class="form-group">
               <label>City</label>
-              <input type="text" name="receiver_city" placeholder="Enter city" />
+              <select name="receiver_city" required>
+                <option value="">Select city</option>
+                {% for city in cities %}
+                  <option value="{{ city }}">{{ city }}</option>
+                {% endfor %}
+              </select>
             </div>
             <div class="form-group">
               <label>District</label>
@@ -101,21 +110,6 @@
             <div class="form-group">
               <label>Estimated Value (NPR)</label>
               <input type="number" name="value" placeholder="0" min="0" />
-            </div>
-          </div>
-
-          <div class="form-row three-col">
-            <div class="form-group">
-              <label>Length (cm)</label>
-              <input type="number" name="length" placeholder="0" />
-            </div>
-            <div class="form-group">
-              <label>Width (cm)</label>
-              <input type="number" name="width" placeholder="0" />
-            </div>
-            <div class="form-group">
-              <label>Height (cm)</label>
-              <input type="number" name="height" placeholder="0" />
             </div>
           </div>
 
@@ -189,6 +183,10 @@
         <div class="summary-info">
           <div class="summary-label">Estimated Total</div>
           <div class="summary-amount" id="totalAmount">NPR 150</div>
+          <div class="summary-info">
+    <div>ETA: <span id="etaValue">3-5 Business Days</span></div>
+    <div>Distance: <span id="distanceValue">10 km</span></div>
+</div>
         </div>
         <div class="summary-actions">
           <button type="submit" class="btn-primary" id="confirmBtn">Confirm &amp; Create Shipment</button>
@@ -202,9 +200,24 @@
 {% block scripts %}
 <script>
   var prices = { Standard: 150, Express: 350, "Same-day": 500 };
+  var eta = {
+    Standard: "3-5 Business Days",
+    Express: "1-2 Business Days",
+    "Same-day": "Delivered Today"
+};
+
+var distance = {
+    Standard: "10 km",
+    Express: "25 km",
+    "Same-day": "50 km"
+};
   document.querySelectorAll('input[name="delivery_type"]').forEach(function(r) {
     r.addEventListener('change', function() {
       document.getElementById('totalAmount').textContent = 'NPR ' + prices[r.value];
+      document.getElementById('etaValue').textContent =
+    eta[r.value];
+document.getElementById('distanceValue').textContent =
+    distance[r.value];
     });
   });
 </script>

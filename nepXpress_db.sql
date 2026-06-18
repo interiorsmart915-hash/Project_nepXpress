@@ -59,6 +59,17 @@ CREATE TABLE system_alerts (
     created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ------system settings----------------------------------------------------------- --
+CREATE TABLE IF NOT EXISTS system_settings (
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    setting_key   VARCHAR(100) NOT NULL UNIQUE,
+    setting_value TEXT,
+    updated_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+
+
 -- ============================================================
 --  Seed Data  
 -- ============================================================
@@ -100,6 +111,19 @@ INSERT IGNORE INTO system_alerts (type, title, message, reference_id, is_read, c
 ('success', 'Payment Confirmed',   'Order #NXP-2846 — NPR 1,200 received',               'NXP-2846', 1, DATE_SUB(NOW(), INTERVAL 5 HOUR)),
 ('info',    'New User Registered', 'Nisha Karki joined as a customer',                   NULL,        1, DATE_SUB(NOW(), INTERVAL 1 DAY));
 
+-- System settings
+INSERT IGNORE INTO system_settings (setting_key, setting_value) VALUES
+('site_name',      'NepXpress'),
+('contact_email',  'admin@nepxpress.com'),
+('currency',       'NPR'),
+('support_phone',  ''),
+('address',        'Kathmandu, Nepal'),
+('notif_delay',         '1'),
+('notif_new_user',      '1'),
+('notif_payment',       '1'),
+('notif_agent_offline', '1'),
+('notif_new_shipment',  '0');
+
 
 
 DESCRIBE users;
@@ -137,5 +161,14 @@ INSERT INTO shipments (tracking_id, customer_id, agent_id, destination, status, 
 
 ALTER TABLE users 
 ADD COLUMN security_answer VARCHAR(255) DEFAULT NULL;
+
+ALTER TABLE shipments
+RENAME COLUMN customer_id TO user_id;
+
+USE nepxpress;
+DESCRIBE shipments;
+
+
+
 
 
