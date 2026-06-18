@@ -104,4 +104,6 @@ class AuthController(BaseController):
 
     def terms(self):
         return render_template("terms.html")
+
+    
     
